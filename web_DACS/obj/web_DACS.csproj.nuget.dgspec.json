@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "D:\\web\\web_QLBNhaHang\\web_DACS\\web_DACS.csproj": {}
+    "D:\\doancoso\\DACS_3TA\\web_DACS\\web_DACS.csproj": {}
   },
   "projects": {
-    "D:\\web\\web_QLBNhaHang\\web_DACS\\web_DACS.csproj": {
+    "D:\\doancoso\\DACS_3TA\\web_DACS\\web_DACS.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\web\\web_QLBNhaHang\\web_DACS\\web_DACS.csproj",
+        "projectUniqueName": "D:\\doancoso\\DACS_3TA\\web_DACS\\web_DACS.csproj",
         "projectName": "web_DACS",
-        "projectPath": "D:\\web\\web_QLBNhaHang\\web_DACS\\web_DACS.csproj",
-        "packagesPath": "C:\\Users\\NHAT TUYEN\\.nuget\\packages\\",
-        "outputPath": "D:\\web\\web_QLBNhaHang\\web_DACS\\obj\\",
+        "projectPath": "D:\\doancoso\\DACS_3TA\\web_DACS\\web_DACS.csproj",
+        "packagesPath": "C:\\Users\\NItro 5\\.nuget\\packages\\",
+        "outputPath": "D:\\doancoso\\DACS_3TA\\web_DACS\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\NHAT TUYEN\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\NItro 5\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -50,6 +50,32 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[8.0.3, )"
+            },
+            "Microsoft.AspNetCore.Identity.UI": {
+              "target": "Package",
+              "version": "[8.0.3, )"
+            },
+            "Microsoft.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[8.0.3, )"
+            },
+            "Microsoft.EntityFrameworkCore.SqlServer": {
+              "target": "Package",
+              "version": "[8.0.3, )"
+            },
+            "Microsoft.EntityFrameworkCore.Tools": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[8.0.3, )"
+            },
+            "Microsoft.VisualStudio.Web.CodeGeneration.Design": {
+              "target": "Package",
+              "version": "[8.0.3, )"
+            },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
               "version": "[6.6.2, )"
@@ -74,7 +100,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.310/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
