@@ -1,13 +1,22 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace web_DACS.Models
 {
     public class BanAn
     {
-        [Key]
         public int Id { get; set; }
-        public string TenBan { get; set; }
-        public int SucChua { get; set; }
-        public string TrangThai { get; set; } // Trống, Đã đặt, Đang dùng
+        public string SoBan { get; set; }
+        public int SoChoNgoi { get; set; }
+        public int TrangThai { get; set; }
+
+        [JsonIgnore] // Chặn vòng lặp khi xuất JSON
+        public virtual ICollection<DatBan> DatBans { get; set; } = new List<DatBan>();
+
+        [NotMapped]
+        public bool IsOwner { get; set; }
+
+        [NotMapped]
+        public DatBan? ActiveDatBan { get; set; }
     }
 }

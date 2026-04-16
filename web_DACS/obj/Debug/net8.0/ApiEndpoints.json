@@ -1,12 +1,171 @@
 [
   {
-    "ContainingType": "BanAnController",
-    "Method": "Get",
+    "ContainingType": "web_DACS.Controllers.Api.BanAnController",
+    "Method": "GetBanAns",
     "RelativePath": "api/BanAn",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
     "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "web_DACS.Controllers.Api.BanAnController",
+    "Method": "Create",
+    "RelativePath": "api/BanAn",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "banAn",
+        "Type": "web_DACS.Models.BanAn",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "web_DACS.Controllers.Api.BanAnController",
+    "Method": "Delete",
+    "RelativePath": "api/BanAn/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "web_DACS.Controllers.Api.BanAnController",
+    "Method": "Update",
+    "RelativePath": "api/BanAn/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "banAn",
+        "Type": "web_DACS.Models.BanAn",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "web_DACS.Controllers.Api.BanAnController",
+    "Method": "ToggleStatus",
+    "RelativePath": "api/BanAn/ToggleStatus/{id}",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "web_DACS.Controllers.Api.DatBanController",
+    "Method": "GetIndex",
+    "RelativePath": "api/DatBan",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "web_DACS.Controllers.Api.DatBanController",
+    "Method": "ConfirmPayment",
+    "RelativePath": "api/DatBan/ConfirmPayment/{id}",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "web_DACS.Controllers.Api.DatBanController",
+    "Method": "Create",
+    "RelativePath": "api/DatBan/Create",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "BookingRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "web_DACS.Controllers.Api.MonAnController",
+    "Method": "GetMonAns",
+    "RelativePath": "api/MonAn",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "searchString",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "web_DACS.Controllers.Api.MonAnController",
+    "Method": "GetTableDetails",
+    "RelativePath": "api/MonAn/GetTableDetails/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "web_DACS.Controllers.Api.MonAnController",
+    "Method": "Order",
+    "RelativePath": "api/MonAn/Order",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "OrderRequest",
+        "IsRequired": true
+      }
+    ],
     "ReturnTypes": []
   },
   {

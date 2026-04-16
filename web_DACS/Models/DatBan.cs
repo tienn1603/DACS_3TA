@@ -1,18 +1,38 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace web_DACS.Models
 {
     public class DatBan
     {
-        [Key]
         public int Id { get; set; }
-        public string TenKhachHang { get; set; }
-        public string SoDienThoai { get; set; }
-        public DateTime ThoiGianDat { get; set; }
-        public int SoLuongNguoi { get; set; }
 
-        // Khóa ngoại liên kết tới bàn
+        [Required(ErrorMessage = "Vui lòng nhập tên khách hàng")]
+        public string TenKhachHang { get; set; }
+
+        [Required(ErrorMessage = "Vui lòng nhập số điện thoại")]
+        [Phone(ErrorMessage = "Số điện thoại không hợp lệ")]
+        public string SoDienThoai { get; set; }
+
+        public DateTime NgayDat { get; set; }
+        public string? GhiChuGopBan { get; set; }
+
+        [Required(ErrorMessage = "Vui lòng chọn giờ đến dự kiến")]
+        public DateTime GioDenDuyKien { get; set; }
+
+        public DateTime GioHetHan => GioDenDuyKien.AddHours(2);
+
         public int BanAnId { get; set; }
-        public BanAn? BanAn { get; set; }
+
+        [JsonIgnore] // Không trả về object BanAn để tránh lặp
+        public virtual BanAn? BanAn { get; set; }
+
+        public int TrangThai { get; set; }
+
+        public string? UserId { get; set; }
+
+
+        public virtual ICollection<ChiTietDatBan> ChiTietDatBans { get; set; } = new List<ChiTietDatBan>();
     }
 }
