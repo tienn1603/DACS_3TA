@@ -1,8 +1,6 @@
-﻿using web_DACS.Data;
-using web_DACS.Models;
+﻿using web_DACS.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using web_DACS.Repositories.Interfaces;
 
@@ -10,15 +8,24 @@ namespace web_DACS.Controllers.Api
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin,User")]
     public class MonAnController : ControllerBase
     {
         private readonly IMonAnRepository _monAnRepo;
-        private readonly ApplicationDbContext _context; 
+        private readonly IDatBanRepository _datBanRepo;
+        private readonly IChiTietDatMonRepository _chiTietDatMonRepo;
+        private readonly IWebHostEnvironment _environment;
 
-        public MonAnController(IMonAnRepository monAnRepo, ApplicationDbContext context)
+        public MonAnController(
+            IMonAnRepository monAnRepo,
+            IDatBanRepository datBanRepo,
+            IChiTietDatMonRepository chiTietDatMonRepo,
+            IWebHostEnvironment environment)
         {
             _monAnRepo = monAnRepo;
-            _context = context;
+            _datBanRepo = datBanRepo;
+            _chiTietDatMonRepo = chiTietDatMonRepo;
+            _environment = environment;
         }
 
         [HttpGet]
@@ -42,31 +49,133 @@ namespace web_DACS.Controllers.Api
             return Ok(result);
         }
 
+        [HttpGet("{id}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetMonAnById(int id)
+        {
+            var monAn = await _monAnRepo.GetByIdAsync(id);
+            if (monAn == null) return NotFound(new { message = "Không tìm thấy món ăn." });
+            return Ok(monAn);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> CreateMonAn([FromForm] CreateMonAnRequest request)
+        {
+            if (string.IsNullOrWhiteSpace(request.TenMon))
+            {
+                return BadRequest(new { message = "Tên món ăn không được để trống." });
+            }
+
+            if (request.Gia <= 0)
+            {
+                return BadRequest(new { message = "Giá món ăn phải lớn hơn 0." });
+            }
+
+            if (!request.IsImageFileValid(out var imageValidationMessage))
+            {
+                return BadRequest(new { message = imageValidationMessage });
+            }
+
+            string? imageFileName = null;
+            if (request.HinhAnhFile != null && request.HinhAnhFile.Length > 0)
+            {
+                imageFileName = await SaveImageAsync(request.HinhAnhFile);
+            }
+
+            var monAn = new MonAn
+            {
+                TenMon = request.TenMon,
+                MoTa = request.MoTa,
+                Gia = request.Gia,
+                Loai = request.Loai,
+                HinhAnh = imageFileName
+            };
+
+            await _monAnRepo.AddAsync(monAn);
+            await _monAnRepo.SaveChangesAsync();
+
+            return Ok(new { message = "Thêm món ăn thành công.", data = monAn });
+        }
+
+        [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdateMonAn(int id, [FromBody] MonAn monAn)
+        {
+            if (id != monAn.Id)
+            {
+                return BadRequest(new { message = "Id không hợp lệ." });
+            }
+
+            var existingMonAn = await _monAnRepo.GetByIdAsync(id);
+            if (existingMonAn == null)
+            {
+                return NotFound(new { message = "Không tìm thấy món ăn cần cập nhật." });
+            }
+
+            if (string.IsNullOrWhiteSpace(monAn.TenMon))
+            {
+                return BadRequest(new { message = "Tên món ăn không được để trống." });
+            }
+
+            if (monAn.Gia <= 0)
+            {
+                return BadRequest(new { message = "Giá món ăn phải lớn hơn 0." });
+            }
+
+            existingMonAn.TenMon = monAn.TenMon;
+            existingMonAn.MoTa = monAn.MoTa;
+            existingMonAn.Gia = monAn.Gia;
+            existingMonAn.HinhAnh = monAn.HinhAnh;
+            existingMonAn.Loai = monAn.Loai;
+
+            _monAnRepo.Update(existingMonAn);
+            await _monAnRepo.SaveChangesAsync();
+
+            return Ok(new { message = "Cập nhật món ăn thành công.", data = existingMonAn });
+        }
+
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DeleteMonAn(int id)
+        {
+            var monAn = await _monAnRepo.GetByIdAsync(id);
+            if (monAn == null)
+            {
+                return NotFound(new { message = "Không tìm thấy món ăn cần xóa." });
+            }
+
+            await _monAnRepo.DeleteAsync(id);
+            await _monAnRepo.SaveChangesAsync();
+
+            return Ok(new { message = "Xóa món ăn thành công." });
+        }
+
         [HttpPost("Order")]
-        [Authorize]
+        [Authorize(Roles = "Admin,User")]
         public async Task<IActionResult> Order([FromBody] OrderRequest request)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             // Tìm đơn đặt bàn đang hoạt động
-            var activeBooking = await _context.DatBans
-                .FirstOrDefaultAsync(d => d.BanAnId == request.BanId
-                                     && d.TrangThai != 2 // 2 là trạng thái đã hoàn tất/hủy tùy logic của bạn
-                                     && (User.IsInRole("Admin") || d.UserId == userId));
+            var activeBooking = await _datBanRepo.GetActiveBookingForTableAsync(
+                request.BanId,
+                userId,
+                User.IsInRole("Admin"));
 
             if (activeBooking == null)
                 return BadRequest(new { message = "Bàn này hiện chưa có khách hoặc bạn không có quyền." });
 
-            var existingItem = await _context.ChiTietDatMons
-                .FirstOrDefaultAsync(o => o.DatBanId == activeBooking.Id && o.MonAnId == request.MonId);
+            var existingItem = await _chiTietDatMonRepo.GetByBookingAndMonAnAsync(activeBooking.Id, request.MonId);
 
             if (existingItem != null)
             {
                 existingItem.SoLuong += (request.SoLuong < 1 ? 1 : request.SoLuong);
+                _chiTietDatMonRepo.Update(existingItem);
             }
             else
             {
-                _context.ChiTietDatMons.Add(new ChiTietDatMon
+                await _chiTietDatMonRepo.AddAsync(new ChiTietDatMon
                 {
                     BanAnId = request.BanId,
                     MonAnId = request.MonId,
@@ -75,36 +184,82 @@ namespace web_DACS.Controllers.Api
                 });
             }
 
-            await _context.SaveChangesAsync();
+            await _chiTietDatMonRepo.SaveChangesAsync();
             return Ok(new { message = "Chọn món thành công!" });
         }
 
         [HttpGet("GetTableDetails/{id}")]
+        [Authorize(Roles = "Admin,User")]
         public async Task<IActionResult> GetTableDetails(int id)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var activeBooking = await _context.DatBans
-                .FirstOrDefaultAsync(d => d.BanAnId == id
-                                     && d.TrangThai != 2
-                                     && (d.UserId == userId || User.IsInRole("Admin")));
+            var activeBooking = await _datBanRepo.GetActiveBookingForTableAsync(
+                id,
+                userId,
+                User.IsInRole("Admin"));
 
             if (activeBooking == null) return Ok(new { monDaDat = new List<object>() });
 
-            var monDaDat = await _context.ChiTietDatMons
-                .Where(ct => ct.DatBanId == activeBooking.Id)
-                .Select(ct => new {
-                    tenMon = ct.MonAn!.TenMon,
-                    soLuong = ct.SoLuong,
-                    gia = ct.MonAn.Gia,
-                    thanhTien = ct.SoLuong * ct.MonAn.Gia
-                }).ToListAsync();
+            var monDaDat = await _chiTietDatMonRepo.GetTableDetailsAsync(activeBooking.Id);
 
             return Ok(new { monDaDat });
+        }
+
+        private async Task<string> SaveImageAsync(IFormFile imageFile)
+        {
+            var imagesFolder = Path.Combine(_environment.ContentRootPath, "frontend", "Images");
+            Directory.CreateDirectory(imagesFolder);
+
+            var extension = Path.GetExtension(imageFile.FileName);
+            var uniqueFileName = $"{Guid.NewGuid():N}{extension}";
+            var filePath = Path.Combine(imagesFolder, uniqueFileName);
+
+            await using var stream = new FileStream(filePath, FileMode.Create);
+            await imageFile.CopyToAsync(stream);
+
+            return uniqueFileName;
         }
     }
 }
 
 // Class phụ để nhận dữ liệu từ JSON body của Frontend
+public class CreateMonAnRequest
+{
+    private const long MaxImageSizeInBytes = 5 * 1024 * 1024; // 5MB
+    private static readonly string[] AllowedImageExtensions = [".jpg", ".jpeg", ".png", ".webp"];
+
+    public string TenMon { get; set; } = string.Empty;
+    public string? MoTa { get; set; }
+    public decimal Gia { get; set; }
+    public string? Loai { get; set; }
+    public IFormFile? HinhAnhFile { get; set; }
+
+    public bool IsImageFileValid(out string? errorMessage)
+    {
+        errorMessage = null;
+
+        if (HinhAnhFile == null || HinhAnhFile.Length == 0)
+        {
+            return true;
+        }
+
+        var extension = Path.GetExtension(HinhAnhFile.FileName).ToLowerInvariant();
+        if (!AllowedImageExtensions.Contains(extension))
+        {
+            errorMessage = "Định dạng ảnh không hợp lệ. Chỉ hỗ trợ: .jpg, .jpeg, .png, .webp";
+            return false;
+        }
+
+        if (HinhAnhFile.Length > MaxImageSizeInBytes)
+        {
+            errorMessage = "Kích thước ảnh vượt quá 5MB.";
+            return false;
+        }
+
+        return true;
+    }
+}
+
 public class OrderRequest
     {
         public int BanId { get; set; }

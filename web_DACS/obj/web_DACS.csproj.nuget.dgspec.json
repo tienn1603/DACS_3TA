@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "D:\\doancoso\\DACS_3TA\\web_DACS\\web_DACS.csproj": {}
+    "D:\\web\\DACS_3TA\\web_DACS\\web_DACS.csproj": {}
   },
   "projects": {
-    "D:\\doancoso\\DACS_3TA\\web_DACS\\web_DACS.csproj": {
+    "D:\\web\\DACS_3TA\\web_DACS\\web_DACS.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\doancoso\\DACS_3TA\\web_DACS\\web_DACS.csproj",
+        "projectUniqueName": "D:\\web\\DACS_3TA\\web_DACS\\web_DACS.csproj",
         "projectName": "web_DACS",
-        "projectPath": "D:\\doancoso\\DACS_3TA\\web_DACS\\web_DACS.csproj",
-        "packagesPath": "C:\\Users\\NItro 5\\.nuget\\packages\\",
-        "outputPath": "D:\\doancoso\\DACS_3TA\\web_DACS\\obj\\",
+        "projectPath": "D:\\web\\DACS_3TA\\web_DACS\\web_DACS.csproj",
+        "packagesPath": "C:\\Users\\NHAT TUYEN\\.nuget\\packages\\",
+        "outputPath": "D:\\web\\DACS_3TA\\web_DACS\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\NItro 5\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\NHAT TUYEN\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -50,6 +50,10 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "Microsoft.AspNetCore.Authentication.JwtBearer": {
+              "target": "Package",
+              "version": "[8.0.3, )"
+            },
             "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
               "target": "Package",
               "version": "[8.0.3, )"
@@ -100,7 +104,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.310/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

@@ -1,0 +1,4 @@
+- Luôn sử dụng Repository Pattern (Interface + Implementation).
+- Mọi phương thức truy xuất DB phải là async/await.
+- Controller chỉ nhận IRepository qua Constructor.
+- Trả về JSON chuẩn: Ok(), NotFound(), hoặc BadRequest().

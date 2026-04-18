@@ -6,7 +6,7 @@ namespace web_DACS.Models
     public class BanAn
     {
         public int Id { get; set; }
-        public string SoBan { get; set; }
+        public string SoBan { get; set; } = string.Empty;
         public int SoChoNgoi { get; set; }
         public int TrangThai { get; set; }
 

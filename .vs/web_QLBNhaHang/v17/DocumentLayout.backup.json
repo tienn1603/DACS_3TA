@@ -1,0 +1,238 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\web\\DACS_3TA\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{89C8346D-9526-4086-A4DC-7207F2D9A955}|web_DACS\\web_DACS.csproj|d:\\web\\dacs_3ta\\web_dacs\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{89C8346D-9526-4086-A4DC-7207F2D9A955}|web_DACS\\web_DACS.csproj|solutionrelative:web_dacs\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{89C8346D-9526-4086-A4DC-7207F2D9A955}|web_DACS\\web_DACS.csproj|d:\\web\\dacs_3ta\\web_dacs\\repositories\\interfaces\\idatbanrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{89C8346D-9526-4086-A4DC-7207F2D9A955}|web_DACS\\web_DACS.csproj|solutionrelative:web_dacs\\repositories\\interfaces\\idatbanrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{89C8346D-9526-4086-A4DC-7207F2D9A955}|web_DACS\\web_DACS.csproj|d:\\web\\dacs_3ta\\web_dacs\\repositories\\interfaces\\igenericrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{89C8346D-9526-4086-A4DC-7207F2D9A955}|web_DACS\\web_DACS.csproj|solutionrelative:web_dacs\\repositories\\interfaces\\igenericrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{89C8346D-9526-4086-A4DC-7207F2D9A955}|web_DACS\\web_DACS.csproj|d:\\web\\dacs_3ta\\web_dacs\\repositories\\implementations\\datbanrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{89C8346D-9526-4086-A4DC-7207F2D9A955}|web_DACS\\web_DACS.csproj|solutionrelative:web_dacs\\repositories\\implementations\\datbanrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{89C8346D-9526-4086-A4DC-7207F2D9A955}|web_DACS\\web_DACS.csproj|d:\\web\\dacs_3ta\\web_dacs\\repositories\\implementations\\bananrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{89C8346D-9526-4086-A4DC-7207F2D9A955}|web_DACS\\web_DACS.csproj|solutionrelative:web_dacs\\repositories\\implementations\\bananrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{89C8346D-9526-4086-A4DC-7207F2D9A955}|web_DACS\\web_DACS.csproj|d:\\web\\dacs_3ta\\web_dacs\\models\\monan.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{89C8346D-9526-4086-A4DC-7207F2D9A955}|web_DACS\\web_DACS.csproj|solutionrelative:web_dacs\\models\\monan.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{89C8346D-9526-4086-A4DC-7207F2D9A955}|web_DACS\\web_DACS.csproj|d:\\web\\dacs_3ta\\web_dacs\\models\\datban.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{89C8346D-9526-4086-A4DC-7207F2D9A955}|web_DACS\\web_DACS.csproj|solutionrelative:web_dacs\\models\\datban.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{89C8346D-9526-4086-A4DC-7207F2D9A955}|web_DACS\\web_DACS.csproj|d:\\web\\dacs_3ta\\web_dacs\\models\\chitietdatmon.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{89C8346D-9526-4086-A4DC-7207F2D9A955}|web_DACS\\web_DACS.csproj|solutionrelative:web_dacs\\models\\chitietdatmon.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{89C8346D-9526-4086-A4DC-7207F2D9A955}|web_DACS\\web_DACS.csproj|d:\\web\\dacs_3ta\\web_dacs\\models\\chitietdatban.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{89C8346D-9526-4086-A4DC-7207F2D9A955}|web_DACS\\web_DACS.csproj|solutionrelative:web_dacs\\models\\chitietdatban.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{89C8346D-9526-4086-A4DC-7207F2D9A955}|web_DACS\\web_DACS.csproj|d:\\web\\dacs_3ta\\web_dacs\\models\\banan.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{89C8346D-9526-4086-A4DC-7207F2D9A955}|web_DACS\\web_DACS.csproj|solutionrelative:web_dacs\\models\\banan.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{89C8346D-9526-4086-A4DC-7207F2D9A955}|web_DACS\\web_DACS.csproj|d:\\web\\dacs_3ta\\web_dacs\\models\\applicationuser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{89C8346D-9526-4086-A4DC-7207F2D9A955}|web_DACS\\web_DACS.csproj|solutionrelative:web_dacs\\models\\applicationuser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{89C8346D-9526-4086-A4DC-7207F2D9A955}|web_DACS\\web_DACS.csproj|d:\\web\\dacs_3ta\\web_dacs\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{89C8346D-9526-4086-A4DC-7207F2D9A955}|web_DACS\\web_DACS.csproj|solutionrelative:web_dacs\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 6,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{eefa5220-e298-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "IDatBanRepository.cs",
+              "DocumentMoniker": "D:\\web\\DACS_3TA\\web_DACS\\Repositories\\Interfaces\\IDatBanRepository.cs",
+              "RelativeDocumentMoniker": "web_DACS\\Repositories\\Interfaces\\IDatBanRepository.cs",
+              "ToolTip": "D:\\web\\DACS_3TA\\web_DACS\\Repositories\\Interfaces\\IDatBanRepository.cs",
+              "RelativeToolTip": "web_DACS\\Repositories\\Interfaces\\IDatBanRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-17T09:02:57.462Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "IGenericRepository.cs",
+              "DocumentMoniker": "D:\\web\\DACS_3TA\\web_DACS\\Repositories\\Interfaces\\IGenericRepository.cs",
+              "RelativeDocumentMoniker": "web_DACS\\Repositories\\Interfaces\\IGenericRepository.cs",
+              "ToolTip": "D:\\web\\DACS_3TA\\web_DACS\\Repositories\\Interfaces\\IGenericRepository.cs",
+              "RelativeToolTip": "web_DACS\\Repositories\\Interfaces\\IGenericRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-17T09:02:55.246Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "DatBanRepository.cs",
+              "DocumentMoniker": "D:\\web\\DACS_3TA\\web_DACS\\Repositories\\Implementations\\DatBanRepository.cs",
+              "RelativeDocumentMoniker": "web_DACS\\Repositories\\Implementations\\DatBanRepository.cs",
+              "ToolTip": "D:\\web\\DACS_3TA\\web_DACS\\Repositories\\Implementations\\DatBanRepository.cs",
+              "RelativeToolTip": "web_DACS\\Repositories\\Implementations\\DatBanRepository.cs",
+              "ViewState": "AgIAACcAAAAAAAAAAAAowAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-16T14:13:25.346Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "D:\\web\\DACS_3TA\\web_DACS\\appsettings.json",
+              "RelativeDocumentMoniker": "web_DACS\\appsettings.json",
+              "ToolTip": "D:\\web\\DACS_3TA\\web_DACS\\appsettings.json",
+              "RelativeToolTip": "web_DACS\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-04-16T13:52:04.325Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "BanAnRepository.cs",
+              "DocumentMoniker": "D:\\web\\DACS_3TA\\web_DACS\\Repositories\\Implementations\\BanAnRepository.cs",
+              "RelativeDocumentMoniker": "web_DACS\\Repositories\\Implementations\\BanAnRepository.cs",
+              "ToolTip": "D:\\web\\DACS_3TA\\web_DACS\\Repositories\\Implementations\\BanAnRepository.cs",
+              "RelativeToolTip": "web_DACS\\Repositories\\Implementations\\BanAnRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-16T14:13:24.627Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "MonAn.cs",
+              "DocumentMoniker": "D:\\web\\DACS_3TA\\web_DACS\\Models\\MonAn.cs",
+              "RelativeDocumentMoniker": "web_DACS\\Models\\MonAn.cs",
+              "ToolTip": "D:\\web\\DACS_3TA\\web_DACS\\Models\\MonAn.cs",
+              "RelativeToolTip": "web_DACS\\Models\\MonAn.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-16T14:13:22.649Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "DatBan.cs",
+              "DocumentMoniker": "D:\\web\\DACS_3TA\\web_DACS\\Models\\DatBan.cs",
+              "RelativeDocumentMoniker": "web_DACS\\Models\\DatBan.cs",
+              "ToolTip": "D:\\web\\DACS_3TA\\web_DACS\\Models\\DatBan.cs",
+              "RelativeToolTip": "web_DACS\\Models\\DatBan.cs",
+              "ViewState": "AgIAABEAAAAAAAAAAAAgwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-16T14:02:54.51Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "ChiTietDatMon.cs",
+              "DocumentMoniker": "D:\\web\\DACS_3TA\\web_DACS\\Models\\ChiTietDatMon.cs",
+              "RelativeDocumentMoniker": "web_DACS\\Models\\ChiTietDatMon.cs",
+              "ToolTip": "D:\\web\\DACS_3TA\\web_DACS\\Models\\ChiTietDatMon.cs",
+              "RelativeToolTip": "web_DACS\\Models\\ChiTietDatMon.cs",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAYwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-16T14:02:53.615Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "ChiTietDatBan.cs",
+              "DocumentMoniker": "D:\\web\\DACS_3TA\\web_DACS\\Models\\ChiTietDatBan.cs",
+              "RelativeDocumentMoniker": "web_DACS\\Models\\ChiTietDatBan.cs",
+              "ToolTip": "D:\\web\\DACS_3TA\\web_DACS\\Models\\ChiTietDatBan.cs",
+              "RelativeToolTip": "web_DACS\\Models\\ChiTietDatBan.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-16T14:02:52.946Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "BanAn.cs",
+              "DocumentMoniker": "D:\\web\\DACS_3TA\\web_DACS\\Models\\BanAn.cs",
+              "RelativeDocumentMoniker": "web_DACS\\Models\\BanAn.cs",
+              "ToolTip": "D:\\web\\DACS_3TA\\web_DACS\\Models\\BanAn.cs",
+              "RelativeToolTip": "web_DACS\\Models\\BanAn.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-16T14:02:52.383Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "ApplicationUser.cs",
+              "DocumentMoniker": "D:\\web\\DACS_3TA\\web_DACS\\Models\\ApplicationUser.cs",
+              "RelativeDocumentMoniker": "web_DACS\\Models\\ApplicationUser.cs",
+              "ToolTip": "D:\\web\\DACS_3TA\\web_DACS\\Models\\ApplicationUser.cs",
+              "RelativeToolTip": "web_DACS\\Models\\ApplicationUser.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-16T14:02:51.678Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "Program.cs",
+              "DocumentMoniker": "D:\\web\\DACS_3TA\\web_DACS\\Program.cs",
+              "RelativeDocumentMoniker": "web_DACS\\Program.cs",
+              "ToolTip": "D:\\web\\DACS_3TA\\web_DACS\\Program.cs",
+              "RelativeToolTip": "web_DACS\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-16T13:52:03.246Z"
+            }
+          ]
+        },
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": -1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

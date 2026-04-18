@@ -2,31 +2,25 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using web_DACS.Repositories.Interfaces;
 using System.Security.Claims;
+using web_DACS.Repositories.Interfaces;
 
 namespace web_DACS.Controllers.Api
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin,User")]
     public class DatBanController : ControllerBase
     {
         private readonly IDatBanRepository _datBanRepo;
-        private readonly IBanAnRepository _banAnRepo;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly Data.ApplicationDbContext _context; // Dùng cho Chi tiết món
 
         public DatBanController(
             IDatBanRepository datBanRepo,
-            IBanAnRepository banAnRepo,
-            UserManager<ApplicationUser> userManager,
-            Data.ApplicationDbContext context)
+            UserManager<ApplicationUser> userManager)
         {
             _datBanRepo = datBanRepo;
-            _banAnRepo = banAnRepo;
             _userManager = userManager;
-            _context = context;
         }
 
         [HttpGet]
@@ -37,7 +31,7 @@ namespace web_DACS.Controllers.Api
         }
 
         [HttpPost("Create")]
-        [Authorize]
+        [Authorize(Roles = "Admin,User")]
         public async Task<IActionResult> Create([FromBody] BookingRequest request)
         {
             var user = await _userManager.GetUserAsync(User);
@@ -63,33 +57,11 @@ namespace web_DACS.Controllers.Api
                 TrangThai = 0
             };
 
-            await _datBanRepo.AddAsync(datBan);
-            await _datBanRepo.SaveChangesAsync();
+            var cartItems = request.CartItems?
+                .Select(i => (i.Id, i.Qty < 1 ? 1 : i.Qty))
+                .ToList() ?? [];
 
-            // Cập nhật trạng thái bàn thông qua BanAnRepository
-            var ban = await _banAnRepo.GetByIdAsync(request.BanAnId);
-            if (ban != null)
-            {
-                ban.TrangThai = 2; // Màu vàng
-                await _banAnRepo.UpdateAsync(ban);
-                await _banAnRepo.SaveChangesAsync();
-            }
-
-            // Lưu món ăn
-            if (request.CartItems != null && request.CartItems.Any())
-            {
-                foreach (var item in request.CartItems)
-                {
-                    _context.ChiTietDatMons.Add(new ChiTietDatMon
-                    {
-                        DatBanId = datBan.Id,
-                        MonAnId = item.Id,
-                        SoLuong = item.Qty,
-                        BanAnId = request.BanAnId
-                    });
-                }
-                await _context.SaveChangesAsync();
-            }
+            await _datBanRepo.CreateWithDetailsAsync(datBan, cartItems);
 
             return Ok(new { message = "Thành công!", bookingId = datBan.Id });
         }
@@ -98,32 +70,37 @@ namespace web_DACS.Controllers.Api
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> ConfirmPayment(int id)
         {
-            var donDat = await _datBanRepo.GetByIdAsync(id);
-            if (donDat == null) return NotFound();
-
-            // Giải phóng bàn (xử lý cả bàn đơn và bàn gộp)
-            if (!string.IsNullOrEmpty(donDat.GhiChuGopBan))
-            {
-                var ids = donDat.GhiChuGopBan.Split(',').Select(int.Parse);
-                foreach (var bId in ids)
-                {
-                    var b = await _banAnRepo.GetByIdAsync(bId);
-                    if (b != null) b.TrangThai = 0;
-                }
-            }
-            else if (donDat.BanAn != null)
-            {
-                donDat.BanAn.TrangThai = 0;
-            }
-
-            // Xóa món và đơn
-            var chiTiet = _context.ChiTietDatMons.Where(c => c.DatBanId == id);
-            _context.ChiTietDatMons.RemoveRange(chiTiet);
-
-            await _datBanRepo.DeleteAsync(id);
-            await _datBanRepo.SaveChangesAsync();
+            var success = await _datBanRepo.ConfirmPaymentAsync(id);
+            if (!success) return NotFound();
 
             return Ok(new { message = "Đã thanh toán và giải phóng bàn!" });
+        }
+
+        [HttpGet("my-history")]
+        [Authorize(Roles = "Admin,User")]
+        public async Task<IActionResult> GetMyHistory()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId)) return Unauthorized();
+
+            var history = await _datBanRepo.GetByUserIdAsync(userId);
+            return Ok(history);
+        }
+
+        [HttpDelete("cancel/{id}")]
+        [Authorize(Roles = "Admin,User")]
+        public async Task<IActionResult> CancelBooking(int id)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId)) return Unauthorized();
+
+            var success = await _datBanRepo.CancelPendingBookingAsync(id, userId);
+            if (!success)
+            {
+                return BadRequest(new { message = "Không thể hủy đơn. Chỉ đơn Pending của chính bạn mới được hủy." });
+            }
+
+            return Ok(new { message = "Hủy đơn thành công, bàn đã được cập nhật Available." });
         }
     }
 }
@@ -132,8 +109,8 @@ namespace web_DACS.Controllers.Api
 public class BookingRequest
     {
         public int BanAnId { get; set; }
-        public string TenKhachHang { get; set; }
-        public string SoDienThoai { get; set; }
+        public string TenKhachHang { get; set; } = string.Empty;
+        public string SoDienThoai { get; set; } = string.Empty;
         public DateTime GioDenDuyKien { get; set; }
         public List<CartItemDTO>? CartItems { get; set; }
     }
