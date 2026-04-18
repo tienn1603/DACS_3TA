@@ -1,5 +1,53 @@
 [
   {
+    "ContainingType": "Program\u002B\u003C\u003Ec",
+    "Method": "\u003C\u003CMain\u003E$\u003Eb__0_5",
+    "RelativePath": "",
+    "HttpMethod": "GET",
+    "IsController": false,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "System.Void",
+        "MediaTypes": [],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "web_DACS.Controllers.Api.AccountController",
+    "Method": "Login",
+    "RelativePath": "api/Account/login",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "web_DACS.Controllers.Api.LoginRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "web_DACS.Controllers.Api.AccountController",
+    "Method": "Register",
+    "RelativePath": "api/Account/register",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "web_DACS.Controllers.Api.RegisterRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "web_DACS.Controllers.Api.BanAnController",
     "Method": "GetBanAns",
     "RelativePath": "api/BanAn",
@@ -90,6 +138,22 @@
   },
   {
     "ContainingType": "web_DACS.Controllers.Api.DatBanController",
+    "Method": "CancelBooking",
+    "RelativePath": "api/DatBan/cancel/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "web_DACS.Controllers.Api.DatBanController",
     "Method": "ConfirmPayment",
     "RelativePath": "api/DatBan/ConfirmPayment/{id}",
     "HttpMethod": "POST",
@@ -121,6 +185,16 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "web_DACS.Controllers.Api.DatBanController",
+    "Method": "GetMyHistory",
+    "RelativePath": "api/DatBan/my-history",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "web_DACS.Controllers.Api.MonAnController",
     "Method": "GetMonAns",
     "RelativePath": "api/MonAn",
@@ -132,6 +206,95 @@
         "Name": "searchString",
         "Type": "System.String",
         "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "web_DACS.Controllers.Api.MonAnController",
+    "Method": "CreateMonAn",
+    "RelativePath": "api/MonAn",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "TenMon",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "MoTa",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Gia",
+        "Type": "System.Decimal",
+        "IsRequired": false
+      },
+      {
+        "Name": "Loai",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "HinhAnhFile",
+        "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "web_DACS.Controllers.Api.MonAnController",
+    "Method": "GetMonAnById",
+    "RelativePath": "api/MonAn/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "web_DACS.Controllers.Api.MonAnController",
+    "Method": "UpdateMonAn",
+    "RelativePath": "api/MonAn/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "monAn",
+        "Type": "web_DACS.Models.MonAn",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "web_DACS.Controllers.Api.MonAnController",
+    "Method": "DeleteMonAn",
+    "RelativePath": "api/MonAn/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
       }
     ],
     "ReturnTypes": []

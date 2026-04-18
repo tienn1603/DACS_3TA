@@ -9,11 +9,11 @@ namespace web_DACS.Models
         public int Id { get; set; }
 
         [Required(ErrorMessage = "Vui lòng nhập tên khách hàng")]
-        public string TenKhachHang { get; set; }
+        public string TenKhachHang { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Vui lòng nhập số điện thoại")]
         [Phone(ErrorMessage = "Số điện thoại không hợp lệ")]
-        public string SoDienThoai { get; set; }
+        public string SoDienThoai { get; set; } = string.Empty;
 
         public DateTime NgayDat { get; set; }
         public string? GhiChuGopBan { get; set; }

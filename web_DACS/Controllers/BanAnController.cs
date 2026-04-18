@@ -1,8 +1,6 @@
-﻿using web_DACS.Data;
-using web_DACS.Models;
+﻿using web_DACS.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using web_DACS.Repositories.Interfaces; 
 
@@ -10,15 +8,16 @@ namespace web_DACS.Controllers.Api
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin,User")]
     public class BanAnController : ControllerBase
     {
         private readonly IBanAnRepository _repo; 
-        private readonly ApplicationDbContext _context; 
+        private readonly IDatBanRepository _datBanRepo;
 
-        public BanAnController(IBanAnRepository repo, ApplicationDbContext context)
+        public BanAnController(IBanAnRepository repo, IDatBanRepository datBanRepo)
         {
             _repo = repo;
-            _context = context;
+            _datBanRepo = datBanRepo;
         }
 
         // 1. Lấy danh sách sơ đồ bàn thực tế
@@ -26,22 +25,17 @@ namespace web_DACS.Controllers.Api
         public async Task<IActionResult> GetBanAns()
         {
             var bayGio = DateTime.Now;
-            var expiredBookings = await _context.DatBans
-                .Include(d => d.BanAn)
-                .Where(d => d.TrangThai == 0 && bayGio > d.GioDenDuyKien.AddMinutes(1))
-                .ToListAsync();
+            var expiredBookings = await _datBanRepo.GetExpiredPendingBookingsAsync(bayGio);
 
             foreach (var booking in expiredBookings)
             {
                 booking.TrangThai = 3;
                 if (booking.BanAn != null) booking.BanAn.TrangThai = 0;
             }
-            if (expiredBookings.Any()) await _context.SaveChangesAsync();
+            if (expiredBookings.Any()) await _datBanRepo.SaveChangesAsync();
 
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var allActiveBookings = await _context.DatBans
-                .Where(d => d.TrangThai == 0 || d.TrangThai == 1)
-                .ToListAsync();
+            var allActiveBookings = await _datBanRepo.GetActiveBookingsAsync();
 
             var listBanAn = await _repo.GetAllAsync(); 
 
@@ -85,7 +79,7 @@ namespace web_DACS.Controllers.Api
             if (banAn == null) return NotFound();
 
             banAn.TrangThai = (banAn.TrangThai == 0) ? 1 : 0;
-            await _repo.UpdateAsync(banAn);
+            _repo.Update(banAn);
             await _repo.SaveChangesAsync();
             return Ok(new { message = "Cập nhật thành công", currentStatus = banAn.TrangThai });
         }
@@ -109,7 +103,7 @@ namespace web_DACS.Controllers.Api
         public async Task<IActionResult> Update(int id, [FromBody] BanAn banAn)
         {
             if (id != banAn.Id) return BadRequest();
-            await _repo.UpdateAsync(banAn);
+            _repo.Update(banAn);
             await _repo.SaveChangesAsync();
             return Ok(new { message = "Cập nhật thành công" });
         }

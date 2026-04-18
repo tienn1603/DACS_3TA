@@ -2,15 +2,10 @@
 
 namespace web_DACS.Repositories.Interfaces
 {
-    public interface IMonAnRepository
+    public interface IMonAnRepository : IGenericRepository<MonAn>
     {
         Task<IEnumerable<MonAn>> GetAllAsync(string? searchString);
-        Task<MonAn?> GetByIdAsync(int id);
-        Task AddAsync(MonAn monAn);
         Task AddRangeAsync(IEnumerable<MonAn> monAns);
-        Task UpdateAsync(MonAn monAn);
-        Task DeleteAsync(int id);
         Task<bool> AnyAsync();
-        Task SaveChangesAsync();
     }
 }
