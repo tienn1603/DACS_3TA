@@ -25,7 +25,7 @@
     "Parameters": [
       {
         "Name": "request",
-        "Type": "web_DACS.Controllers.Api.LoginRequest",
+        "Type": "web_DACS.DTOs.LoginRequest",
         "IsRequired": true
       }
     ],
@@ -41,7 +41,7 @@
     "Parameters": [
       {
         "Name": "request",
-        "Type": "web_DACS.Controllers.Api.RegisterRequest",
+        "Type": "web_DACS.DTOs.RegisterRequest",
         "IsRequired": true
       }
     ],
@@ -66,8 +66,8 @@
     "Order": 0,
     "Parameters": [
       {
-        "Name": "banAn",
-        "Type": "web_DACS.Models.BanAn",
+        "Name": "request",
+        "Type": "web_DACS.Controllers.Api.CreateBanAnRequest",
         "IsRequired": true
       }
     ],
@@ -103,11 +103,21 @@
         "IsRequired": true
       },
       {
-        "Name": "banAn",
-        "Type": "web_DACS.Models.BanAn",
+        "Name": "request",
+        "Type": "web_DACS.Controllers.Api.UpdateBanAnRequest",
         "IsRequired": true
       }
     ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "web_DACS.Controllers.Api.BanAnController",
+    "Method": "GetBanAnsMap",
+    "RelativePath": "api/BanAn/map",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
     "ReturnTypes": []
   },
   {
@@ -178,7 +188,7 @@
     "Parameters": [
       {
         "Name": "request",
-        "Type": "BookingRequest",
+        "Type": "web_DACS.DTOs.BookingRequest",
         "IsRequired": true
       }
     ],
@@ -276,8 +286,8 @@
         "IsRequired": true
       },
       {
-        "Name": "monAn",
-        "Type": "web_DACS.Models.MonAn",
+        "Name": "request",
+        "Type": "web_DACS.Controllers.Api.UpdateMonAnRequest",
         "IsRequired": true
       }
     ],
@@ -325,31 +335,10 @@
     "Parameters": [
       {
         "Name": "request",
-        "Type": "OrderRequest",
+        "Type": "web_DACS.DTOs.OrderRequest",
         "IsRequired": true
       }
     ],
     "ReturnTypes": []
-  },
-  {
-    "ContainingType": "web_DACS.Controllers.WeatherForecastController",
-    "Method": "Get",
-    "RelativePath": "WeatherForecast",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [],
-    "ReturnTypes": [
-      {
-        "Type": "System.Collections.Generic.IEnumerable\u00601[[web_DACS.WeatherForecast, web_DACS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 200
-      }
-    ],
-    "EndpointName": "GetWeatherForecast"
   }
 ]

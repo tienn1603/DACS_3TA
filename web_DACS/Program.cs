@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
@@ -8,6 +9,8 @@ using web_DACS.Data;
 using web_DACS.Models;
 using web_DACS.Repositories.Implementations;
 using web_DACS.Repositories.Interfaces;
+using web_DACS.Services.Implementations;
+using web_DACS.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -46,10 +49,17 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+// ── Repository Layer ──────────────────────────────────────────
 builder.Services.AddScoped<IBanAnRepository, BanAnRepository>();
 builder.Services.AddScoped<IDatBanRepository, DatBanRepository>();
 builder.Services.AddScoped<IMonAnRepository, MonAnRepository>();
 builder.Services.AddScoped<IChiTietDatMonRepository, ChiTietDatMonRepository>();
+
+// ── Service Layer (N-Tier) ───────────────────────────────────
+builder.Services.AddScoped<IMonAnService, MonAnService>();
+builder.Services.AddScoped<IDatBanService, DatBanService>();
+builder.Services.AddScoped<IBanAnService, BanAnService>();
+builder.Services.AddScoped<IAccountService, AccountService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -94,22 +104,32 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+app.UseCors("AllowAll");
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
+// HTTPS redirection must come BEFORE static files so that /frontend/... URLs
+// are not intercepted and redirected before the static file middleware runs.
 app.UseHttpsRedirection();
 
-app.UseCors("AllowAll");
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+        Path.Combine(builder.Environment.ContentRootPath, "frontend")),
+    RequestPath = "/frontend"
+});
+
+
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 await DbInitializer.SeedRolesAndAdminAsync(app.Services);
 
-app.MapGet("/", () => Results.Redirect("/swagger"));
+app.MapGet("/", () => Results.Redirect("/swagger/index.html"));
 app.MapControllers();
 
 app.Run();

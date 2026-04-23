@@ -86,21 +86,33 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/BanAn"
+                "$ref": "#/components/schemas/CreateBanAnRequest"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/BanAn"
+                "$ref": "#/components/schemas/CreateBanAnRequest"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/BanAn"
+                "$ref": "#/components/schemas/CreateBanAnRequest"
               }
             }
           }
         },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/BanAn/map": {
+      "get": {
+        "tags": [
+          "BanAn"
+        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -172,17 +184,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/BanAn"
+                "$ref": "#/components/schemas/UpdateBanAnRequest"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/BanAn"
+                "$ref": "#/components/schemas/UpdateBanAnRequest"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/BanAn"
+                "$ref": "#/components/schemas/UpdateBanAnRequest"
               }
             }
           }
@@ -412,17 +424,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/MonAn"
+                "$ref": "#/components/schemas/UpdateMonAnRequest"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/MonAn"
+                "$ref": "#/components/schemas/UpdateMonAnRequest"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/MonAn"
+                "$ref": "#/components/schemas/UpdateMonAnRequest"
               }
             }
           }
@@ -509,45 +521,6 @@
         }
       }
     },
-    "/WeatherForecast": {
-      "get": {
-        "tags": [
-          "WeatherForecast"
-        ],
-        "operationId": "GetWeatherForecast",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/WeatherForecast"
-                  }
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/WeatherForecast"
-                  }
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/WeatherForecast"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/": {
       "get": {
         "tags": [
@@ -563,34 +536,6 @@
   },
   "components": {
     "schemas": {
-      "BanAn": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "soBan": {
-            "type": "string",
-            "nullable": true
-          },
-          "soChoNgoi": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "trangThai": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "isOwner": {
-            "type": "boolean"
-          },
-          "activeDatBan": {
-            "$ref": "#/components/schemas/DatBan"
-          }
-        },
-        "additionalProperties": false
-      },
       "BookingRequest": {
         "type": "object",
         "properties": {
@@ -634,90 +579,16 @@
         },
         "additionalProperties": false
       },
-      "ChiTietDatBan": {
+      "CreateBanAnRequest": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "datBanId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "datBan": {
-            "$ref": "#/components/schemas/DatBan"
-          },
-          "monAnId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "monAn": {
-            "$ref": "#/components/schemas/MonAn"
-          },
-          "soLuong": {
-            "type": "integer",
-            "format": "int32"
-          }
-        },
-        "additionalProperties": false
-      },
-      "DatBan": {
-        "required": [
-          "gioDenDuyKien",
-          "soDienThoai",
-          "tenKhachHang"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "tenKhachHang": {
-            "minLength": 1,
-            "type": "string"
-          },
-          "soDienThoai": {
-            "minLength": 1,
-            "type": "string",
-            "format": "tel"
-          },
-          "ngayDat": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "ghiChuGopBan": {
+          "soBan": {
             "type": "string",
             "nullable": true
           },
-          "gioDenDuyKien": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "gioHetHan": {
-            "type": "string",
-            "format": "date-time",
-            "readOnly": true
-          },
-          "banAnId": {
+          "soChoNgoi": {
             "type": "integer",
             "format": "int32"
-          },
-          "trangThai": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "userId": {
-            "type": "string",
-            "nullable": true
-          },
-          "chiTietDatBans": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ChiTietDatBan"
-            },
-            "nullable": true
           }
         },
         "additionalProperties": false
@@ -730,36 +601,6 @@
             "nullable": true
           },
           "password": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "MonAn": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "tenMon": {
-            "type": "string",
-            "nullable": true
-          },
-          "moTa": {
-            "type": "string",
-            "nullable": true
-          },
-          "gia": {
-            "type": "number",
-            "format": "double"
-          },
-          "hinhAnh": {
-            "type": "string",
-            "nullable": true
-          },
-          "loai": {
             "type": "string",
             "nullable": true
           }
@@ -814,23 +655,45 @@
         },
         "additionalProperties": false
       },
-      "WeatherForecast": {
+      "UpdateBanAnRequest": {
         "type": "object",
         "properties": {
-          "date": {
+          "soBan": {
             "type": "string",
-            "format": "date"
+            "nullable": true
           },
-          "temperatureC": {
+          "soChoNgoi": {
             "type": "integer",
             "format": "int32"
           },
-          "temperatureF": {
+          "trangThai": {
             "type": "integer",
             "format": "int32",
-            "readOnly": true
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateMonAnRequest": {
+        "type": "object",
+        "properties": {
+          "tenMon": {
+            "type": "string",
+            "nullable": true
           },
-          "summary": {
+          "moTa": {
+            "type": "string",
+            "nullable": true
+          },
+          "gia": {
+            "type": "number",
+            "format": "double"
+          },
+          "loai": {
+            "type": "string",
+            "nullable": true
+          },
+          "hinhAnh": {
             "type": "string",
             "nullable": true
           }

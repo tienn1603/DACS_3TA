@@ -12,5 +12,6 @@ namespace web_DACS.Repositories.Interfaces
         Task<bool> ConfirmPaymentAsync(int datBanId);
         Task<List<DatBan>> GetByUserIdAsync(string userId);
         Task<bool> CancelPendingBookingAsync(int datBanId, string userId);
+        Task<bool> ConfirmBookingAsync(int datBanId);
     }
 }

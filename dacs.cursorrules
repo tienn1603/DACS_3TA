@@ -1,4 +1,12 @@
-- Luôn sử dụng Repository Pattern (Interface + Implementation).
-- Mọi phương thức truy xuất DB phải là async/await.
-- Controller chỉ nhận IRepository qua Constructor.
-- Trả về JSON chuẩn: Ok(), NotFound(), hoặc BadRequest().
+1. Kiến trúc hệ thống (Structure Rules):
+- Separation of Concerns: Tuân thủ nghiêm ngặt luồng: Controller ➡️ Service ➡️ Repository ➡️ Database.
+- Entity & Repository: Mỗi bảng trong DB tương ứng 1-1 với một Entity và một Repository. (Ví dụ: MonAn -> MonAnRepository).
+- Service (Nghiệp vụ): Được thiết kế theo chức năng nghiệp vụ (ví dụ: OrderService, AuthenticateService). Một Service có thể inject nhiều Repository để thực hiện logic, nhưng Service không được chứa Service khác.
+- Mapping: Việc Mapping giữa Model/DTO và Entity, Validation dữ liệu, và Xử lý lỗi (try-catch) phải được thực hiện tại Controller.
+
+2. Quy tắc viết Code (Coding Standards):
+- Async/Await: Mọi phương thức truy xuất dữ liệu và xử lý logic phải sử dụng async/await.
+- Dependency Injection: Controller chỉ inject IService. Service chỉ inject IRepository.
+- Phản hồi API (Response Format): Controller luôn trả về định dạng JSON nhất quán sau:
+-Áp dụng format trả về:
+  return Ok(new { status = true/false, message = ..., data = ... });

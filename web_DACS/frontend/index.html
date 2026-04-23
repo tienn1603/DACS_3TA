@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>3TA — Đặt bàn & Thực đơn</title>
-  <link rel="stylesheet" href="shared.css" />
+  <link rel="stylesheet" href="css/shared.css" />
   <style>
     /* ── Hero ─────────────────────────────────────────── */
     .hero {
@@ -584,6 +584,14 @@
           <h3 class="reservation-card__title">🍽️ Đặt bàn của bạn</h3>
 
           <div class="form-group">
+            <label class="form-label">Họ tên khách hàng <span style="color:var(--status-occupied)">*</span></label>
+            <input class="form-input" type="text" id="res-name" placeholder="Nhập họ tên của bạn" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Số điện thoại <span style="color:var(--status-occupied)">*</span></label>
+            <input class="form-input" type="tel" id="res-phone" placeholder="0xxx xxx xxx" />
+          </div>
+          <div class="form-group">
             <label class="form-label">Chọn ngày & giờ <span style="color:var(--status-occupied)">*</span></label>
             <input class="form-input" type="datetime-local" id="res-date" />
           </div>
@@ -699,7 +707,8 @@
   <div class="toast-container"></div>
 
   <script type="module">
-    import api, { MonAnApi, BanAnApi, DatBanApi, Auth, Toast, formatPrice, formatDate, getImageUrl } from './js/apiClient.js';
+    import { Auth } from './js/services/authService.js';
+    import api, { MonAnApi, BanAnApi, DatBanApi, Toast, formatPrice, formatDate, getImageUrl } from './js/apiClient.js';
     import MonAnComponent from './components/MonAnComponent.js';
 
     // ── State ──────────────────────────────────────────────
@@ -890,14 +899,18 @@
         return;
       }
 
-      const ngayDat = document.getElementById('res-date').value;
-      if (!ngayDat) { Toast.error('Vui lòng chọn ngày & giờ'); return; }
+      
+      const tenKhachHang = document.getElementById('res-name').value.trim();
+      const soDienThoai  = document.getElementById('res-phone').value.trim();
+      const ngayDat       = document.getElementById('res-date').value;
+      if (!tenKhachHang) { Toast.error('Vui lòng nhập họ tên'); return; }
+      if (!soDienThoai)  { Toast.error('Vui lòng nhập số điện thoại'); return; }
+      if (!ngayDat)       { Toast.error('Vui lòng chọn ngày & giờ'); return; }
       if (!selectedTableId) { Toast.error('Vui lòng chọn bàn'); return; }
 
-      const chiTiet = [...cart.values()].map(({ item, qty }) => ({
-        monAnId: item.id,
-        soLuong: qty,
-        gia: item.gia,
+      const cartItems = [...cart.values()].map(({ item, qty }) => ({
+        id:  item.id,
+        qty: qty,
       }));
 
       const btn = document.getElementById('btn-reserve');
@@ -906,16 +919,20 @@
 
       try {
         await DatBanApi.create({
-          banAnId: selectedTableId,
-          ngayDat: new Date(ngayDat).toISOString(),
-          chiTietDatMon: chiTiet,
+          banAnId:        selectedTableId,
+          tenKhachHang:   tenKhachHang,
+          soDienThoai:    soDienThoai,
+          gioDenDuyKien:  new Date(ngayDat).toISOString(),
+          cartItems:      cartItems,
         });
 
-        Toast.success('🎉 Đặt bàn thành công!');
+        Toast.success('Đặt bàn thành công!');
         cart.clear();
         selectedTableId = null;
         updateCartUI();
-        document.getElementById('res-date').value = '';
+        document.getElementById('res-date').value  = '';
+        document.getElementById('res-name').value  = '';
+        document.getElementById('res-phone').value = '';
         await loadTables();
         await loadHistory();
         document.getElementById('history').scrollIntoView({ behavior: 'smooth' });

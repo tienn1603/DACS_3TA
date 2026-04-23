@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>3TA — Quản trị</title>
-  <link rel="stylesheet" href="shared.css" />
+  <link rel="stylesheet" href="css/shared.css" />
   <style>
     body { overflow-x: hidden; }
 
@@ -463,6 +463,9 @@
           <div class="wave-divider"></div>
           <h2 class="section-title">Quản lý <em>Bàn ăn</em></h2>
         </div>
+        <button class="btn btn-primary" id="btn-add-table" style="margin-left:auto">
+          + Thêm bàn
+        </button>
       </div>
 
       <div class="filter-bar" id="banan-filter">
@@ -530,8 +533,9 @@
 <div class="toast-container"></div>
 
 <script type="module">
-  import api, { MonAnApi, BanAnApi, DatBanApi, Auth, Toast, formatPrice, formatDate } from './apiClient.js';
-  import MonAnComponent from './MonAnComponent.js';
+    import { Auth } from './js/services/authService.js';
+    import api, { MonAnApi, BanAnApi, DatBanApi, Toast, formatPrice, formatDate } from './js/apiClient.js';
+  import MonAnComponent from './components/MonAnComponent.js';
 
   // Auth guard
   if (!Auth.isLoggedIn() || !Auth.isAdmin()) {
@@ -597,20 +601,21 @@
   async function loadDashboard() {
     try {
       const [tables, reservations] = await Promise.all([
-        BanAnApi.getAll(),
+        BanAnApi.getAll().catch(() => []),
         DatBanApi.getAll().catch(() => []),
       ]);
 
-      const available = tables.filter(t => t.trangThai?.toLowerCase() === 'available').length;
-      const occupied  = tables.filter(t => t.trangThai?.toLowerCase() === 'occupied').length;
-      const pending   = reservations.filter(r => r.trangThai?.toLowerCase() === 'pending').length;
+      // trangThai: 0=Available, 1=Occupied, 2=Reserved
+      const available = tables.filter(t => t.TrangThai === 0).length;
+      const occupied  = tables.filter(t => t.TrangThai === 1).length;
+      const reserved  = tables.filter(t => t.TrangThai === 2).length;
+      // trangThai: 0=Pending, 1=Confirmed, -1=Cancelled, 3=Expired
+      const pending   = reservations.filter(r => r.TrangThai === 0).length;
 
-      // Update pending badge
       const badge = document.getElementById('pending-badge');
       badge.textContent = pending;
       badge.style.display = pending > 0 ? 'inline' : 'none';
 
-      // Stat cards
       document.getElementById('stat-cards').innerHTML = `
         <div class="stat-card blue">
           <div class="stat-card__icon">🪑</div>
@@ -629,56 +634,50 @@
         </div>
         <div class="stat-card red">
           <div class="stat-card__icon">🔥</div>
-          <div class="stat-card__num">${occupied}</div>
+          <div class="stat-card__num">${occupied + reserved}</div>
           <div class="stat-card__label">Bàn đang dùng</div>
         </div>
       `;
 
-      // Recent reservations
-      const recent = [...reservations].slice(0,5);
-      const badgeMap = {
-        'pending':'badge-pending','confirmed':'badge-confirmed',
-        'paid':'badge-confirmed','cancelled':'badge-cancelled',
-      };
-      const labelMap = {
-        'pending':'Chờ xác nhận','confirmed':'Đã xác nhận',
-        'paid':'Đã TT','cancelled':'Đã hủy',
-      };
+      const recent = [...reservations].slice(0, 5);
+      const badgeMap = { 0:'badge-pending', 1:'badge-confirmed', 2:'badge-reserved', 3:'badge-reserved', '-1':'badge-cancelled' };
+      const labelMap = { 0:'Chờ xác nhận', 1:'Đã xác nhận', 2:'Đã đặt', 3:'Hết hạn', '-1':'Đã hủy' };
 
       document.getElementById('dash-recent').innerHTML = recent.length
         ? recent.map(r => `
             <div style="display:flex;justify-content:space-between;align-items:center;padding:var(--space-3) 0;border-bottom:1px solid var(--border-subtle)">
               <div>
-                <div style="font-size:var(--text-sm);color:var(--text-primary)">#${r.id} — Bàn ${r.banAnId}</div>
-                <div style="font-size:var(--text-xs);color:var(--text-muted)">${formatDate(r.ngayDat)}</div>
+                <div style="font-size:var(--text-sm);color:var(--text-primary)">#${r.Id ?? r.id} — Bàn ${r.BanAnId ?? r.banAnId}</div>
+                <div style="font-size:var(--text-xs);color:var(--text-muted)">${formatDate(r.NgayDat ?? r.ngayDat)}</div>
               </div>
-              <span class="badge ${badgeMap[r.trangThai?.toLowerCase()] || 'badge-pending'}">
-                ${labelMap[r.trangThai?.toLowerCase()] || r.trangThai}
+              <span class="badge ${badgeMap[r.TrangThai ?? r.trangThai] || 'badge-pending'}">
+                ${labelMap[r.TrangThai ?? r.trangThai] || (r.TrangThai ?? r.trangThai)}
               </span>
             </div>
           `).join('')
         : '<p style="color:var(--text-muted);font-size:var(--text-sm)">Chưa có đặt bàn nào</p>';
 
-      // Table status pie-like summary
+      const totalNonAvail = occupied + reserved;
       const statuses = [
-        { label: 'Trống',      count: available,                     color: 'var(--status-available)' },
-        { label: 'Đang dùng',  count: occupied,                     color: 'var(--status-occupied)'  },
-        { label: 'Đã đặt',     count: tables.length - available - occupied, color: 'var(--status-reserved)'  },
+        { label: 'Trống',     count: available,                   color: 'var(--status-available)' },
+        { label: 'Đang dùng',count: occupied,                   color: 'var(--status-occupied)'  },
+        { label: 'Đã đặt',   count: reserved,                   color: 'var(--status-reserved)'  },
       ];
 
       document.getElementById('dash-tables').innerHTML = `
-        ${statuses.map(s => `
+        ${statuses.map(s => {
+          const pct = tables.length > 0 ? Math.round(s.count / tables.length * 100) : 0;
+          return `
           <div style="display:flex;align-items:center;gap:var(--space-4);padding:var(--space-4) 0;border-bottom:1px solid var(--border-subtle)">
             <div style="width:42px;height:42px;border-radius:var(--radius-md);background:rgba(0,0,0,0.2);border:2px solid ${s.color};display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:var(--text-lg);font-weight:600;color:${s.color};flex-shrink:0">${s.count}</div>
             <div>
               <div style="font-size:var(--text-sm);color:var(--text-primary)">${s.label}</div>
-              <div style="font-size:var(--text-xs);color:var(--text-muted)">${tables.length > 0 ? Math.round(s.count / tables.length * 100) : 0}% tổng số bàn</div>
+              <div style="font-size:var(--text-xs);color:var(--text-muted)">${pct}% tổng số bàn</div>
             </div>
             <div style="margin-left:auto;height:4px;flex:1;max-width:80px;background:var(--bg-surface);border-radius:var(--radius-full);overflow:hidden">
-              <div style="height:100%;width:${tables.length > 0 ? Math.round(s.count/tables.length*100) : 0}%;background:${s.color};border-radius:var(--radius-full)"></div>
+              <div style="height:100%;width:${pct}%;background:${s.color};border-radius:var(--radius-full)"></div>
             </div>
-          </div>
-        `).join('')}
+          </div>`;}).join('')}
       `;
 
     } catch (err) {
@@ -708,11 +707,17 @@
     }
   }
 
+  // trangThai: 0=Available, 1=Occupied, 2=Reserved
+  const banAnStatusLabel = { 0:'Trống', 1:'Đang dùng', 2:'Đã đặt' };
+  const banAnBadgeClass  = { 0:'badge-available', 1:'badge-occupied', 2:'badge-reserved' };
+  const banAnFilterMap   = { all: null, available: 0, occupied: 1, reserved: 2 };
+
   function renderBanAnGrid() {
     const grid = document.getElementById('banan-grid');
-    const filtered = banAnFilter === 'all'
+    const numericStatus = banAnFilterMap[banAnFilter] ?? null;
+    const filtered = numericStatus === null
       ? allTables
-      : allTables.filter(t => t.trangThai?.toLowerCase() === banAnFilter);
+      : allTables.filter(t => (t.TrangThai ?? t.trangThai) === numericStatus);
 
     if (!filtered.length) {
       grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="empty-state__icon">🪑</div><p>Không có bàn nào</p></div>`;
@@ -720,29 +725,45 @@
     }
 
     grid.innerHTML = filtered.map(t => {
-      const status = t.trangThai?.toLowerCase() || 'available';
-      const statusLabel = { available:'Trống', occupied:'Đang dùng', reserved:'Đã đặt' };
-      const badgeClass  = { available:'badge-available', occupied:'badge-occupied', reserved:'badge-reserved' };
+      const st = t.TrangThai ?? t.trangThai;
+      const soBan = t.SoBan ?? t.soBan ?? '?';
+      const soCho = t.SoChoNgoi ?? t.soChoNgoi ?? '?';
       return `
-        <div class="banan-card ${status}" data-id="${t.id}">
-          <div class="banan-card__num">${t.soBan}</div>
-          <div class="banan-card__seats">${t.soChoNgoi} chỗ ngồi</div>
-          <span class="badge ${badgeClass[status] || 'badge-available'}">${statusLabel[status] || t.trangThai}</span>
-          <div style="margin-top:var(--space-3)">
-            <button class="btn btn-ghost btn-sm" style="width:100%;font-size:11px" data-edit="${t.id}">
-              Cập nhật
-            </button>
+        <div class="banan-card ${banAnStatusLabel[st] ? banAnStatusLabel[st].toLowerCase().replace(' ', '-') : 'available'}" data-id="${t.Id ?? t.id}">
+          <div class="banan-card__num">${soBan}</div>
+          <div class="banan-card__seats">${soCho} chỗ ngồi</div>
+          <span class="badge ${banAnBadgeClass[st] || 'badge-available'}">${banAnStatusLabel[st] || (st ?? '?')}</span>
+          <div style="display:flex;gap:var(--space-2);margin-top:var(--space-3)">
+            <button class="btn btn-ghost btn-sm" style="flex:1;font-size:11px" data-edit="${t.Id ?? t.id}">Sửa</button>
+            <button class="btn btn-danger btn-sm" style="font-size:11px" data-delete="${t.Id ?? t.id}" title="Xóa bàn">✕</button>
           </div>
         </div>
       `;
     }).join('');
 
     grid.querySelectorAll('[data-edit]').forEach(btn => {
-      btn.addEventListener('click', () => openBanAnModal(allTables.find(t => t.id === parseInt(btn.dataset.edit))));
+      const id = parseInt(btn.dataset.edit);
+      btn.addEventListener('click', () => openBanAnModal(allTables.find(t => (t.Id ?? t.id) === id)));
+    });
+
+    grid.querySelectorAll('[data-delete]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const id = parseInt(btn.dataset.delete);
+        if (!confirm(`Xóa bàn #${id}?`)) return;
+        btn.disabled = true;
+        try {
+          await BanAnApi.delete(id);
+          Toast.success('Đã xóa bàn');
+          await loadBanAn();
+          loadDashboard();
+        } catch (err) {
+          Toast.error(err.message || 'Xóa thất bại');
+          btn.disabled = false;
+        }
+      });
     });
   }
 
-  // BanAn filter chips
   document.getElementById('banan-filter').querySelectorAll('.filter-chip').forEach(chip => {
     chip.addEventListener('click', () => {
       document.querySelectorAll('#banan-filter .filter-chip').forEach(c => c.classList.remove('active'));
@@ -752,31 +773,35 @@
     });
   });
 
-  // BanAn edit modal
   function openBanAnModal(table) {
     const modal = document.getElementById('banan-modal');
     const body  = document.getElementById('banan-modal-body');
+    const isNew = !table;
+
+    document.querySelector('#banan-modal .modal__title').textContent = isNew ? 'Thêm bàn ăn' : 'Cập nhật bàn ăn';
 
     body.innerHTML = `
       <div class="form-group">
         <label class="form-label">Số bàn</label>
-        <input class="form-input" id="edit-soban" type="number" value="${table.soBan}" />
+        <input class="form-input" id="edit-Soban" type="text" value="${isNew ? '' : (table.SoBan ?? table.soBan ?? '')}" placeholder="${isNew ? 'VD: B01, B-3' : ''}" />
       </div>
       <div class="form-group">
         <label class="form-label">Số chỗ ngồi</label>
-        <input class="form-input" id="edit-socho" type="number" value="${table.soChoNgoi}" />
+        <input class="form-input" id="edit-socho" type="number" min="1" value="${isNew ? '' : (table.SoChoNgoi ?? table.soChoNgoi ?? '')}" placeholder="${isNew ? 'VD: 4' : ''}" />
       </div>
+      ${isNew ? '' : `
       <div class="form-group">
         <label class="form-label">Trạng thái</label>
         <select class="form-select" id="edit-trangthai">
-          <option value="Available"  ${table.trangThai === 'Available'  ? 'selected' : ''}>Trống</option>
-          <option value="Occupied"   ${table.trangThai === 'Occupied'   ? 'selected' : ''}>Đang dùng</option>
-          <option value="Reserved"   ${table.trangThai === 'Reserved'   ? 'selected' : ''}>Đã đặt</option>
+          <option value="0" ${!table || (table.TrangThai ?? table.trangThai) === 0 ? 'selected' : ''}>Trống</option>
+          <option value="1" ${!table || (table.TrangThai ?? table.trangThai) === 1 ? 'selected' : ''}>Đang dùng</option>
+          <option value="2" ${!table || (table.TrangThai ?? table.trangThai) === 2 ? 'selected' : ''}>Đã đặt</option>
         </select>
       </div>
+      `}
       <div style="display:flex;gap:var(--space-3);justify-content:flex-end">
         <button class="btn btn-ghost" id="banan-modal-cancel">Huỷ</button>
-        <button class="btn btn-primary" id="banan-modal-save">Lưu</button>
+        <button class="btn btn-primary" id="banan-modal-save">${isNew ? 'Thêm' : 'Lưu'}</button>
       </div>
     `;
 
@@ -791,21 +816,31 @@
       const btn = document.getElementById('banan-modal-save');
       btn.disabled = true; btn.textContent = 'Đang lưu…';
       try {
-        await BanAnApi.update(table.id, {
-          soBan:      parseInt(document.getElementById('edit-soban').value),
-          soChoNgoi:  parseInt(document.getElementById('edit-socho').value),
-          trangThai:  document.getElementById('edit-trangthai').value,
-        });
-        Toast.success('Cập nhật bàn thành công');
+        if (isNew) {
+          await BanAnApi.create({
+            SoBan:     document.getElementById('edit-Soban').value.trim(),
+            SoChoNgoi: parseInt(document.getElementById('edit-socho').value) || 0,
+          });
+          Toast.success('Thêm bàn thành công');
+        } else {
+          await BanAnApi.update(table.Id ?? table.id, {
+            SoBan:     document.getElementById('edit-Soban').value.trim(),
+            SoChoNgoi: parseInt(document.getElementById('edit-socho').value) || 0,
+            TrangThai: parseInt(document.getElementById('edit-trangthai').value) || 0,
+          });
+          Toast.success('Cập nhật bàn thành công');
+        }
         close();
         await loadBanAn();
         loadDashboard();
       } catch (err) {
-        Toast.error(err.message || 'Cập nhật thất bại');
-        btn.disabled = false; btn.textContent = 'Lưu';
+        Toast.error(err.message || 'Thao tác thất bại');
+        btn.disabled = false; btn.textContent = isNew ? 'Thêm' : 'Lưu';
       }
     });
   }
+
+  document.getElementById('btn-add-table').addEventListener('click', () => openBanAnModal(null));
 
   // ── ĐẶT BÀN ─────────────────────────────────────────
   let allReservations = [];
@@ -822,46 +857,43 @@
     }
   }
 
+  // trangThai: 0=Pending, 1=Confirmed, 2=Occupied, 3=Expired, -1=Cancelled
+  const datBanBadgeMap = { 0:'badge-pending', 1:'badge-confirmed', 2:'badge-reserved', 3:'badge-reserved', '-1':'badge-cancelled' };
+  const datBanLabelMap = { 0:'Chờ xác nhận', 1:'Đã xác nhận', 2:'Đang dùng', 3:'Hết hạn', '-1':'Đã hủy' };
+  const datBanFilterMap = { all: null, pending: 0, confirmed: 1, paid: 2, cancelled: -1 };
+
   function renderDatBanTable() {
     const tbody = document.getElementById('datban-tbody');
-    const data  = datBanFilter === 'all'
+    const numericStatus = datBanFilterMap[datBanFilter] ?? null;
+    const filtered = numericStatus === null
       ? allReservations
-      : allReservations.filter(r => r.trangThai?.toLowerCase() === datBanFilter);
+      : allReservations.filter(r => (r.TrangThai ?? r.trangThai) === numericStatus);
 
-    if (!data.length) {
+    if (!filtered.length) {
       tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state" style="padding:var(--space-8)"><div class="empty-state__icon">📋</div><p>Không có đơn nào</p></div></td></tr>`;
       return;
     }
 
-    const badgeMap = {
-      'pending':'badge-pending','confirmed':'badge-confirmed',
-      'paid':'badge-confirmed','cancelled':'badge-cancelled',
-    };
-    const labelMap = {
-      'pending':'Chờ xác nhận','confirmed':'Đã xác nhận',
-      'paid':'Đã thanh toán','cancelled':'Đã hủy',
-    };
-
-    tbody.innerHTML = data.map(r => {
-      const st = r.trangThai?.toLowerCase();
+    tbody.innerHTML = filtered.map(r => {
+      const st = r.TrangThai ?? r.trangThai;
       return `
         <tr>
-          <td style="font-family:var(--font-mono);font-size:var(--text-xs);color:var(--text-muted)">#${r.id}</td>
+          <td style="font-family:var(--font-mono);font-size:var(--text-xs);color:var(--text-muted)">#${r.Id ?? r.id}</td>
           <td style="color:var(--text-primary)">
-            <div style="font-weight:500">User #${r.userId}</div>
+            <div style="font-weight:500">${r.TenKhachHang ?? r.tenKhachHang ?? '?'}</div>
+            <div style="font-size:var(--text-xs);color:var(--text-muted)">${r.SoDienThoai ?? r.soDienThoai ?? '?'}</div>
           </td>
-          <td>Bàn ${r.banAnId}</td>
-          <td>${formatDate(r.ngayDat)}</td>
-          <td><span class="badge ${badgeMap[st] || 'badge-pending'}">${labelMap[st] || r.trangThai}</span></td>
+          <td>Bàn ${r.BanAnId ?? r.banAnId ?? '?'}</td>
+          <td>${formatDate(r.NgayDat ?? r.ngayDat)}</td>
+          <td><span class="badge ${datBanBadgeMap[st] || 'badge-pending'}">${datBanLabelMap[st] || (st ?? '?')}</span></td>
           <td>
             <div style="display:flex;gap:var(--space-2);align-items:center">
-              ${st === 'pending' ? `
-                <button class="btn btn-primary btn-sm" data-confirm="${r.id}" title="Xác nhận thanh toán">
-                  ✓ TT
-                </button>
-              ` : ''}
-              ${(st === 'pending' || st === 'confirmed') ? `
-                <button class="btn btn-danger btn-sm" data-cancel-id="${r.id}">Hủy</button>
+              ${st === 0 ? `
+                <button class="btn btn-primary btn-sm" data-confirm-booking="${r.Id ?? r.id}" title="Xác nhận đặt bàn">✓</button>
+                <button class="btn btn-danger btn-sm" data-cancel-id="${r.Id ?? r.id}">Hủy</button>
+              ` : st === 1 ? `
+                <button class="btn btn-success btn-sm" data-pay="${r.Id ?? r.id}" title="Xác nhận thanh toán">TT</button>
+                <button class="btn btn-danger btn-sm" data-cancel-id="${r.Id ?? r.id}">Hủy</button>
               ` : '—'}
             </div>
           </td>
@@ -869,24 +901,38 @@
       `;
     }).join('');
 
-    // Confirm payment
-    tbody.querySelectorAll('[data-confirm]').forEach(btn => {
+    tbody.querySelectorAll('[data-confirm-booking]').forEach(btn => {
       btn.addEventListener('click', async () => {
-        if (!confirm('Xác nhận thanh toán cho đơn #' + btn.dataset.confirm + '?')) return;
+        if (!confirm('Xác nhận đơn đặt bàn #' + btn.dataset.confirmBooking + '?')) return;
         btn.disabled = true; btn.textContent = '…';
         try {
-          await DatBanApi.confirmPayment({ datBanId: parseInt(btn.dataset.confirm) });
-          Toast.success('Đã xác nhận thanh toán');
+          await DatBanApi.confirmBooking(parseInt(btn.dataset.confirmBooking));
+          Toast.success('Đã xác nhận đặt bàn');
           await loadDatBan();
           loadDashboard();
         } catch (err) {
           Toast.error(err.message || 'Lỗi xác nhận');
-          btn.disabled = false; btn.textContent = '✓ TT';
+          btn.disabled = false; btn.textContent = '✓';
         }
       });
     });
 
-    // Cancel
+    tbody.querySelectorAll('[data-pay]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        if (!confirm('Xác nhận thanh toán cho đơn #' + btn.dataset.pay + '?')) return;
+        btn.disabled = true; btn.textContent = '…';
+        try {
+          await DatBanApi.confirmPayment(parseInt(btn.dataset.pay));
+          Toast.success('Đã thanh toán và giải phóng bàn');
+          await loadDatBan();
+          loadDashboard();
+        } catch (err) {
+          Toast.error(err.message || 'Lỗi thanh toán');
+          btn.disabled = false; btn.textContent = 'TT';
+        }
+      });
+    });
+
     tbody.querySelectorAll('[data-cancel-id]').forEach(btn => {
       btn.addEventListener('click', async () => {
         if (!confirm('Hủy đơn đặt bàn #' + btn.dataset.cancelId + '?')) return;
@@ -904,7 +950,6 @@
     });
   }
 
-  // DatBan filter chips
   document.getElementById('datban-filter').querySelectorAll('.filter-chip').forEach(chip => {
     chip.addEventListener('click', () => {
       document.querySelectorAll('#datban-filter .filter-chip').forEach(c => c.classList.remove('active'));

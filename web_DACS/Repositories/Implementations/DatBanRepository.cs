@@ -192,5 +192,19 @@ namespace web_DACS.Repositories.Implementations
                 throw;
             }
         }
+
+        public async Task<bool> ConfirmBookingAsync(int datBanId)
+        {
+            var donDat = await _context.DatBans
+                .Include(d => d.BanAn)
+                .FirstOrDefaultAsync(d => d.Id == datBanId && d.TrangThai == 0);
+
+            if (donDat == null) return false;
+
+            donDat.TrangThai = 1;
+            if (donDat.BanAn != null) donDat.BanAn.TrangThai = 2;
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 }
