@@ -33,6 +33,6 @@ namespace web_DACS.Models
         public string? UserId { get; set; }
 
 
-        public virtual ICollection<ChiTietDatBan> ChiTietDatBans { get; set; } = new List<ChiTietDatBan>();
+        public virtual ICollection<ChiTietDatMon> ChiTietDatMons { get; set; } = new List<ChiTietDatMon>();
     }
 }

@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>3TA — Tài khoản của tôi</title>
+  <link rel="stylesheet" href="css/shared.css"" />
+  <style>
+
+    /* ── Page Layout ─────────────────────────────────────── */
+    .profile-page {
+      padding-top: calc(var(--navbar-height) + var(--space-10));
+      padding-bottom: var(--space-20);
+      min-height: 100vh;
+    }
+
+    /* Ambient glow background */
+    .profile-page::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background:
+        radial-gradient(ellipse 70% 50% at 20% 20%, rgba(14,77,110,0.22) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 60% at 85% 70%, rgba(26,122,138,0.12) 0%, transparent 55%);
+    }
+
+    .profile-container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 var(--space-8);
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── Profile Header / Hero ───────────────────────────── */
+    .profile-hero {
+      display: flex;
+      align-items: flex-end;
+      gap: var(--space-8);
+      margin-bottom: var(--space-10);
+      padding-bottom: var(--space-8);
+      border-bottom: 1px solid var(--border-subtle);
+      animation: slideUp 0.5s ease both;
+    }
+
+    .avatar-wrap {
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .avatar {
+      width: 96px; height: 96px;
+      border-radius: var(--radius-xl);
+      background: linear-gradient(135deg, var(--color-ocean), var(--color-teal), var(--color-wave));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: var(--text-3xl);
+      font-weight: 600;
+      color: var(--color-deep);
+      letter-spacing: 0.05em;
+      border: 2px solid rgba(42,171,184,0.35);
+      box-shadow: 0 8px 32px rgba(42,171,184,0.25);
+    }
+
+    .avatar-status {
+      position: absolute;
+      bottom: 6px; right: 6px;
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      background: var(--status-available);
+      border: 2px solid var(--bg-primary);
+      box-shadow: 0 0 8px rgba(46,204,138,0.5);
+    }
+
+    .profile-hero__info { flex: 1; min-width: 0; }
+
+    .profile-hero__label {
+      font-size: var(--text-xs);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent-primary);
+      margin-bottom: var(--space-2);
+    }
+
+    .profile-hero__name {
+      font-family: var(--font-display);
+      font-size: var(--text-3xl);
+      font-weight: 400;
+      line-height: 1.1;
+      color: var(--text-primary);
+      margin-bottom: var(--space-2);
+    }
+
+    .profile-hero__meta {
+      display: flex;
+      align-items: center;
+      gap: var(--space-5);
+      flex-wrap: wrap;
+    }
+
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: var(--text-sm);
+      color: var(--text-muted);
+    }
+
+    .meta-item svg { flex-shrink: 0; }
+
+    .profile-hero__actions {
+      display: flex;
+      gap: var(--space-3);
+      flex-shrink: 0;
+      align-self: flex-start;
+    }
+
+    /* ── Main Grid ───────────────────────────────────────── */
+    .profile-grid {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: var(--space-8);
+      align-items: start;
+    }
+
+    /* ── Sidebar Panels ──────────────────────────────────── */
+    .sidebar-panels {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-5);
+    }
+
+    .panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      animation: slideUp 0.5s ease both;
+    }
+
+    .panel:nth-child(2) { animation-delay: 0.07s; }
+    .panel:nth-child(3) { animation-delay: 0.14s; }
+
+    .panel__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-5) var(--space-6);
+      border-bottom: 1px solid var(--border-subtle);
+      cursor: pointer;
+      user-select: none;
+      transition: background var(--transition-fast);
+    }
+
+    .panel__header:hover { background: rgba(42,171,184,0.03); }
+
+    .panel__header-left {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    .panel__icon {
+      width: 34px; height: 34px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .panel__icon--teal   { background: rgba(42,171,184,0.12); }
+    .panel__icon--amber  { background: rgba(245,166,35,0.12); }
+    .panel__icon--green  { background: rgba(46,204,138,0.12); }
+
+    .panel__title {
+      font-size: var(--text-sm);
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .panel__subtitle {
+      font-size: var(--text-xs);
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .panel__chevron {
+      color: var(--text-muted);
+      transition: transform var(--transition-base);
+      flex-shrink: 0;
+    }
+
+    .panel.open .panel__chevron { transform: rotate(180deg); }
+
+    .panel__body {
+      display: none;
+      padding: var(--space-6);
+      animation: fadeIn 0.2s ease;
+    }
+
+    .panel.open .panel__body { display: block; }
+
+    /* ── Form Rows ───────────────────────────────────────── */
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-4);
+    }
+
+    /* Input with leading icon */
+    .input-icon-group {
+      position: relative;
+    }
+
+    .input-icon-group .icon {
+      position: absolute;
+      left: var(--space-4);
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .input-icon-group .form-input {
+      padding-left: calc(var(--space-4) + 16px + var(--space-3));
+    }
+
+    /* Password strength bar */
+    .pw-strength {
+      margin-top: var(--space-2);
+      height: 3px;
+      border-radius: var(--radius-full);
+      background: var(--border-subtle);
+      overflow: hidden;
+    }
+
+    .pw-strength__bar {
+      height: 100%;
+      border-radius: var(--radius-full);
+      transition: width 0.3s ease, background 0.3s ease;
+      width: 0%;
+    }
+
+    .pw-hint {
+      font-size: var(--text-xs);
+      color: var(--text-muted);
+      margin-top: var(--space-1);
+    }
+
+    /* ── Stats Strip ─────────────────────────────────────── */
+    .stats-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border-subtle);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-bottom: var(--space-6);
+      animation: slideUp 0.5s ease 0.05s both;
+    }
+
+    .stat-cell {
+      background: var(--bg-card);
+      padding: var(--space-5) var(--space-4);
+      text-align: center;
+    }
+
+    .stat-cell__num {
+      font-family: var(--font-display);
+      font-size: var(--text-2xl);
+      font-weight: 600;
+      color: var(--accent-primary);
+      line-height: 1;
+    }
+
+    .stat-cell__label {
+      font-size: var(--text-xs);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-top: var(--space-1);
+    }
+
+    /* ── History Section ─────────────────────────────────── */
+    .history-section {
+      animation: slideUp 0.5s ease 0.1s both;
+    }
+
+    .history-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-5);
+    }
+
+    .history-title {
+      font-family: var(--font-display);
+      font-size: var(--text-xl);
+      font-weight: 400;
+    }
+
+    .history-filter {
+      display: flex;
+      gap: var(--space-2);
+    }
+
+    .hf-chip {
+      padding: var(--space-2) var(--space-4);
+      border-radius: var(--radius-full);
+      border: 1px solid var(--border-subtle);
+      background: transparent;
+      color: var(--text-muted);
+      font-size: var(--text-xs);
+      font-family: var(--font-body);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      letter-spacing: 0.04em;
+    }
+
+    .hf-chip:hover  { border-color: var(--border-active); color: var(--accent-primary); }
+    .hf-chip.active { background: rgba(42,171,184,0.1); border-color: var(--border-active); color: var(--accent-primary); }
+
+    /* ── Reservation Card ────────────────────────────────── */
+    .res-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      margin-bottom: var(--space-4);
+      overflow: hidden;
+      transition: border-color var(--transition-base), box-shadow var(--transition-base);
+    }
+
+    .res-card:hover {
+      border-color: var(--border-active);
+      box-shadow: var(--shadow-md);
+    }
+
+    /* Card header row */
+    .res-card__head {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      padding: var(--space-5) var(--space-6);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .res-card__id {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      color: var(--text-muted);
+      background: var(--bg-surface);
+      padding: 3px 8px;
+      border-radius: var(--radius-sm);
+      flex-shrink: 0;
+    }
+
+    .res-card__table {
+      font-size: var(--text-sm);
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .res-card__date {
+      font-size: var(--text-xs);
+      color: var(--text-muted);
+    }
+
+    .res-card__total {
+      font-family: var(--font-display);
+      font-size: var(--text-lg);
+      color: var(--accent-primary);
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+
+    .res-card__toggle {
+      color: var(--text-muted);
+      flex-shrink: 0;
+      transition: transform var(--transition-base);
+    }
+
+    .res-card.expanded .res-card__toggle { transform: rotate(180deg); }
+
+    /* Card detail area */
+    .res-card__detail {
+      display: none;
+      border-top: 1px solid var(--border-subtle);
+      padding: var(--space-5) var(--space-6);
+      animation: fadeIn 0.2s ease;
+    }
+
+    .res-card.expanded .res-card__detail { display: block; }
+
+    .dish-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      margin-bottom: var(--space-4);
+    }
+
+    .dish-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      padding: var(--space-3) var(--space-4);
+      background: var(--bg-surface);
+      border-radius: var(--radius-md);
+    }
+
+    .dish-row__img {
+      width: 44px; height: 44px;
+      border-radius: var(--radius-md);
+      object-fit: cover;
+      background: var(--bg-card);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      overflow: hidden;
+    }
+
+    .dish-row__img img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+    }
+
+    .dish-row__name {
+      flex: 1;
+      font-size: var(--text-sm);
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .dish-row__qty {
+      font-size: var(--text-xs);
+      color: var(--text-muted);
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-full);
+      padding: 2px 8px;
+      flex-shrink: 0;
+    }
+
+    .dish-row__price {
+      font-size: var(--text-sm);
+      color: var(--accent-primary);
+      font-family: var(--font-display);
+      flex-shrink: 0;
+      min-width: 90px;
+      text-align: right;
+    }
+
+    /* Total row */
+    .res-total-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: var(--space-4);
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .res-total-row__label { font-size: var(--text-sm); color: var(--text-muted); }
+
+    .res-total-row__amount {
+      font-family: var(--font-display);
+      font-size: var(--text-xl);
+      color: var(--accent-primary);
+    }
+
+    .res-card__actions {
+      display: flex;
+      gap: var(--space-3);
+      margin-top: var(--space-4);
+      padding-top: var(--space-4);
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    /* ── Empty / Loading ─────────────────────────────────── */
+    .history-loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-4);
+      padding: var(--space-16);
+      color: var(--text-muted);
+      font-size: var(--text-sm);
+    }
+
+    .history-empty {
+      text-align: center;
+      padding: var(--space-16);
+      color: var(--text-muted);
+    }
+
+    .history-empty__icon {
+      font-size: 3.5rem;
+      opacity: 0.35;
+      margin-bottom: var(--space-4);
+    }
+
+    /* ── Alert inline ────────────────────────────────────── */
+    .inline-alert {
+      display: none;
+      padding: var(--space-3) var(--space-4);
+      border-radius: var(--radius-md);
+      font-size: var(--text-sm);
+      margin-bottom: var(--space-4);
+      border: 1px solid;
+    }
+
+    .inline-alert.show   { display: flex; align-items: center; gap: var(--space-2); animation: fadeIn 0.2s ease; }
+    .inline-alert.error  { background: rgba(224,92,92,0.08); border-color: rgba(224,92,92,0.25); color: #e05c5c; }
+    .inline-alert.success{ background: rgba(46,204,138,0.08); border-color: rgba(46,204,138,0.25); color: var(--status-available); }
+
+    /* ── Responsive ──────────────────────────────────────── */
+    @media (max-width: 900px) {
+      .profile-grid { grid-template-columns: 1fr; }
+      .profile-hero { flex-wrap: wrap; }
+      .profile-hero__actions { width: 100%; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 640px) {
+      .stats-strip { grid-template-columns: 1fr 1fr 1fr; }
+      .res-card__head { flex-wrap: wrap; }
+      .res-card__total { order: -1; margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a href="index.html" class="navbar__brand" style="text-decoration:none">
+      <span style="font-size:1.4rem">🌊</span>
+      3<span class="accent">T</span>A
+    </a>
+    <ul class="navbar__nav">
+      <li><a href="index.html">Trang chủ</a></li>
+      <li><a href="index.html#menu">Thực đơn</a></li>
+      <li><a href="index.html#reservation">Đặt bàn</a></li>
+      <li><a href="profile.html" class="active">Tài khoản</a></li>
+    </ul>
+    <div class="navbar__actions" id="navbar-actions"></div>
+  </nav>
+
+  <div class="profile-page">
+    <div class="profile-container">
+
+      <!-- Hero -->
+      <div class="profile-hero" id="profile-hero">
+        <div class="avatar-wrap">
+          <div class="avatar" id="hero-avatar">…</div>
+          <div class="avatar-status"></div>
+        </div>
+        <div class="profile-hero__info">
+          <div class="profile-hero__label">Tài khoản thành viên</div>
+          <div class="profile-hero__name" id="hero-name">Đang tải…</div>
+          <div class="profile-hero__meta">
+            <div class="meta-item">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
+              </svg>
+              <span id="hero-email">—</span>
+            </div>
+            <div class="meta-item">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+              <span id="hero-joined">Thành viên 3TA</span>
+            </div>
+          </div>
+        </div>
+        <div class="profile-hero__actions">
+          <a href="index.html" class="btn btn-ghost btn-sm">← Trang chủ</a>
+          <button class="btn btn-danger btn-sm" id="btn-logout">Đăng xuất</button>
+        </div>
+      </div>
+
+      <!-- Main grid -->
+      <div class="profile-grid">
+
+        <!-- Left: Settings panels -->
+        <div class="sidebar-panels">
+
+          <!-- Panel: Thông tin cá nhân -->
+          <div class="panel open" id="panel-info">
+            <div class="panel__header" onclick="togglePanel('panel-info')">
+              <div class="panel__header-left">
+                <div class="panel__icon panel__icon--teal">👤</div>
+                <div>
+                  <div class="panel__title">Thông tin cá nhân</div>
+                  <div class="panel__subtitle">Username, email</div>
+                </div>
+              </div>
+              <svg class="panel__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </div>
+            <div class="panel__body">
+              <div class="inline-alert" id="info-alert"></div>
+
+              <div class="form-group">
+                <label class="form-label">Tên đăng nhập</label>
+                <div class="input-icon-group">
+                  <svg class="icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
+                  </svg>
+                  <input class="form-input" type="text" id="input-username" placeholder="Tên đăng nhập" />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Email</label>
+                <div class="input-icon-group">
+                  <svg class="icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                    <polyline points="22,6 12,13 2,6"/>
+                  </svg>
+                  <input class="form-input" type="email" id="input-email" placeholder="email@example.com" />
+                </div>
+              </div>
+
+              <button class="btn btn-primary" style="width:100%;justify-content:center" id="btn-save-info">
+                <span id="save-info-label">Lưu thay đổi</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Panel: Đổi mật khẩu -->
+          <div class="panel" id="panel-pw">
+            <div class="panel__header" onclick="togglePanel('panel-pw')">
+              <div class="panel__header-left">
+                <div class="panel__icon panel__icon--amber">🔐</div>
+                <div>
+                  <div class="panel__title">Đổi mật khẩu</div>
+                  <div class="panel__subtitle">Bảo mật tài khoản</div>
+                </div>
+              </div>
+              <svg class="panel__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </div>
+            <div class="panel__body">
+              <div class="inline-alert" id="pw-alert"></div>
+
+              <div class="form-group">
+                <label class="form-label">Mật khẩu hiện tại</label>
+                <div class="input-icon-group">
+                  <svg class="icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="11" width="18" height="11" rx="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                  </svg>
+                  <input class="form-input" type="password" id="pw-current" placeholder="••••••••" style="padding-right:44px" />
+                  <button class="input-eye" type="button" onclick="toggleEye('pw-current', this)">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Mật khẩu mới</label>
+                <div class="input-icon-group">
+                  <svg class="icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="11" width="18" height="11" rx="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                  </svg>
+                  <input class="form-input" type="password" id="pw-new" placeholder="Tối thiểu 6 ký tự" style="padding-right:44px"
+                    oninput="checkStrength(this.value)" />
+                  <button class="input-eye" type="button" onclick="toggleEye('pw-new', this)">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                    </svg>
+                  </button>
+                </div>
+                <div class="pw-strength"><div class="pw-strength__bar" id="pw-bar"></div></div>
+                <div class="pw-hint" id="pw-hint">Nhập mật khẩu để kiểm tra độ mạnh</div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Xác nhận mật khẩu mới</label>
+                <div class="input-icon-group">
+                  <svg class="icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+                  </svg>
+                  <input class="form-input" type="password" id="pw-confirm" placeholder="Nhập lại mật khẩu mới" />
+                </div>
+              </div>
+
+              <button class="btn btn-primary" style="width:100%;justify-content:center" id="btn-change-pw">
+                <span id="pw-label">Cập nhật mật khẩu</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Panel: Thống kê nhanh -->
+          <div class="panel open" id="panel-stats">
+            <div class="panel__header" onclick="togglePanel('panel-stats')">
+              <div class="panel__header-left">
+                <div class="panel__icon panel__icon--green">📊</div>
+                <div>
+                  <div class="panel__title">Thống kê của tôi</div>
+                  <div class="panel__subtitle">Tóm tắt hoạt động</div>
+                </div>
+              </div>
+              <svg class="panel__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </div>
+            <div class="panel__body" style="padding:0">
+              <div class="stats-strip" style="border-radius:0;margin:0">
+                <div class="stat-cell">
+                  <div class="stat-cell__num" id="stat-total">—</div>
+                  <div class="stat-cell__label">Đơn đặt</div>
+                </div>
+                <div class="stat-cell">
+                  <div class="stat-cell__num" id="stat-paid">—</div>
+                  <div class="stat-cell__label">Đã TT</div>
+                </div>
+                <div class="stat-cell">
+                  <div class="stat-cell__num" id="stat-spend">—</div>
+                  <div class="stat-cell__label">Tổng chi</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right: Reservation History -->
+        <div class="history-section">
+          <div class="history-header">
+            <h2 class="history-title">Lịch sử đặt bàn</h2>
+            <div class="history-filter">
+              <button class="hf-chip active" data-filter="all">Tất cả</button>
+              <button class="hf-chip" data-filter="pending">Chờ xác nhận</button>
+              <button class="hf-chip" data-filter="paid">Đã TT</button>
+              <button class="hf-chip" data-filter="cancelled">Đã hủy</button>
+            </div>
+          </div>
+
+          <div id="history-list">
+            <div class="history-loading">
+              <div class="spinner"></div>
+              <span>Đang tải lịch sử…</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container"></div>
+
+  <!-- Eye icon button style (shared) -->
+  <style>
+    .input-eye {
+      position: absolute;
+      right: var(--space-4);
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 2px;
+      transition: color var(--transition-fast);
+    }
+    .input-eye:hover { color: var(--accent-primary); }
+  </style>
+
+  <script type="module">
+    import api, { AccountApi, Auth, DatBanApi, Toast, formatPrice, formatDate, getImageUrl } from './apiClient.js';
+
+    // ── Auth guard ────────────────────────────────────────
+    if (!Auth.isLoggedIn()) {
+      Toast.error('Vui lòng đăng nhập');
+      setTimeout(() => window.location.href = 'login.html', 800);
+    }
+
+    // ── State ─────────────────────────────────────────────
+    let allHistory = [];
+    let currentFilter = 'all';
+
+    const username = Auth.getUsername() || 'User';
+    const initial  = username.charAt(0).toUpperCase();
+
+    // ── Navbar ────────────────────────────────────────────
+    document.getElementById('navbar-actions').innerHTML = `
+      <div style="display:flex;align-items:center;gap:var(--space-2);padding:var(--space-2) var(--space-4);border-radius:var(--radius-full);border:1px solid var(--border-subtle);font-size:var(--text-sm);color:var(--text-secondary);background:var(--bg-surface)">
+        <div style="width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--color-teal),var(--color-wave));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--color-deep)">${initial}</div>
+        ${username}
+      </div>
+      ${Auth.isAdmin() ? `<a href="admin.html" class="btn btn-ghost btn-sm">Admin ↗</a>` : ''}
+    `;
+
+    // ── Hero ──────────────────────────────────────────────
+    document.getElementById('hero-avatar').textContent = initial;
+    document.getElementById('hero-name').textContent   = username;
+    // Email — nếu backend có endpoint /api/Account/me, gọi ở đây
+    // Hiện tại lấy từ localStorage hoặc để trống
+    const savedEmail = localStorage.getItem('tta_email') || '';
+    document.getElementById('hero-email').textContent = savedEmail || 'Chưa cập nhật email';
+    document.getElementById('input-username').value   = username;
+    document.getElementById('input-email').value      = savedEmail;
+
+    // Logout
+    document.getElementById('btn-logout').addEventListener('click', () => {
+      Auth.clear();
+      window.location.href = 'login.html';
+    });
+
+    // ── Panel toggle ──────────────────────────────────────
+    window.togglePanel = function(id) {
+      document.getElementById(id).classList.toggle('open');
+    };
+
+    // ── Eye toggle ────────────────────────────────────────
+    window.toggleEye = function(inputId, btn) {
+      const input = document.getElementById(inputId);
+      input.type = input.type === 'password' ? 'text' : 'password';
+      btn.style.color = input.type === 'text' ? 'var(--accent-primary)' : '';
+    };
+
+    // ── Password strength ─────────────────────────────────
+    window.checkStrength = function(val) {
+      const bar  = document.getElementById('pw-bar');
+      const hint = document.getElementById('pw-hint');
+      if (!val) {
+        bar.style.width = '0%';
+        hint.textContent = 'Nhập mật khẩu để kiểm tra độ mạnh';
+        return;
+      }
+      let score = 0;
+      if (val.length >= 6)  score++;
+      if (val.length >= 10) score++;
+      if (/[A-Z]/.test(val)) score++;
+      if (/[0-9]/.test(val)) score++;
+      if (/[^A-Za-z0-9]/.test(val)) score++;
+
+      const levels = [
+        { w:'20%', c:'#e05c5c', t:'Rất yếu' },
+        { w:'40%', c:'#f5a623', t:'Yếu' },
+        { w:'60%', c:'#f5a623', t:'Trung bình' },
+        { w:'80%', c:'#2aabb8', t:'Mạnh' },
+        { w:'100%',c:'var(--status-available)', t:'Rất mạnh' },
+      ];
+      const lv = levels[Math.min(score - 1, 4)] || levels[0];
+      bar.style.width      = lv.w;
+      bar.style.background = lv.c;
+      hint.textContent     = lv.t;
+      hint.style.color     = lv.c;
+    };
+
+    // ── Save profile info ─────────────────────────────────
+    document.getElementById('btn-save-info').addEventListener('click', async () => {
+      const newUsername = document.getElementById('input-username').value.trim();
+      const newEmail    = document.getElementById('input-email').value.trim();
+      const alert       = document.getElementById('info-alert');
+      const label       = document.getElementById('save-info-label');
+      const btn         = document.getElementById('btn-save-info');
+
+      hideAlert(alert);
+
+      if (!newUsername) { showAlert(alert, 'error', 'Tên đăng nhập không được để trống'); return; }
+      if (newEmail && !/\S+@\S+\.\S+/.test(newEmail)) { showAlert(alert, 'error', 'Email không hợp lệ'); return; }
+
+      btn.disabled = true;
+      label.textContent = 'Đang lưu…';
+
+      try {
+        // Gọi PUT /api/Account/update nếu backend có endpoint
+        // await api.Account.update({ username: newUsername, email: newEmail });
+
+        // Lưu tạm vào localStorage (thay bằng API call thực tế)
+        localStorage.setItem('tta_username', newUsername);
+        if (newEmail) localStorage.setItem('tta_email', newEmail);
+
+        // Cập nhật UI
+        document.getElementById('hero-name').textContent  = newUsername;
+        document.getElementById('hero-email').textContent = newEmail || 'Chưa cập nhật email';
+        document.getElementById('hero-avatar').textContent = newUsername.charAt(0).toUpperCase();
+
+        showAlert(alert, 'success', 'Đã lưu thông tin thành công');
+        Toast.success('Cập nhật thông tin thành công!');
+      } catch (err) {
+        showAlert(alert, 'error', err.message || 'Lưu thất bại, thử lại sau');
+      } finally {
+        btn.disabled = false;
+        label.textContent = 'Lưu thay đổi';
+      }
+    });
+
+    // ── Change password ───────────────────────────────────
+    document.getElementById('btn-change-pw').addEventListener('click', async () => {
+      const current = document.getElementById('pw-current').value;
+      const nw      = document.getElementById('pw-new').value;
+      const confirm = document.getElementById('pw-confirm').value;
+      const alert   = document.getElementById('pw-alert');
+      const label   = document.getElementById('pw-label');
+      const btn     = document.getElementById('btn-change-pw');
+
+      hideAlert(alert);
+
+      if (!current)           { showAlert(alert, 'error', 'Nhập mật khẩu hiện tại'); return; }
+      if (nw.length < 6)      { showAlert(alert, 'error', 'Mật khẩu mới tối thiểu 6 ký tự'); return; }
+      if (nw !== confirm)     { showAlert(alert, 'error', 'Mật khẩu xác nhận không khớp'); return; }
+      if (current === nw)     { showAlert(alert, 'error', 'Mật khẩu mới phải khác mật khẩu cũ'); return; }
+
+      btn.disabled = true;
+      label.textContent = 'Đang cập nhật…';
+
+      try {
+        // Gọi API đổi mật khẩu — endpoint ví dụ:
+        // await api.request('/api/Account/change-password', {
+        //   method: 'POST',
+        //   body: { currentPassword: current, newPassword: nw }
+        // });
+
+        // Placeholder thành công (thay bằng API thực)
+        await new Promise(r => setTimeout(r, 700));
+        showAlert(alert, 'success', 'Đổi mật khẩu thành công!');
+        Toast.success('Mật khẩu đã được cập nhật');
+        document.getElementById('pw-current').value = '';
+        document.getElementById('pw-new').value     = '';
+        document.getElementById('pw-confirm').value = '';
+        document.getElementById('pw-bar').style.width = '0%';
+        document.getElementById('pw-hint').textContent = 'Nhập mật khẩu để kiểm tra độ mạnh';
+        document.getElementById('pw-hint').style.color = '';
+      } catch (err) {
+        showAlert(alert, 'error', err.message || 'Đổi mật khẩu thất bại');
+      } finally {
+        btn.disabled = false;
+        label.textContent = 'Cập nhật mật khẩu';
+      }
+    });
+
+    // ── Alert helpers ─────────────────────────────────────
+    function showAlert(el, type, msg) {
+      el.className = `inline-alert ${type} show`;
+      el.innerHTML = `
+        <span>${type === 'success' ? '✓' : '!'}</span>
+        <span>${msg}</span>
+      `;
+    }
+    function hideAlert(el) { el.className = 'inline-alert'; }
+
+    // ── Filter chips ──────────────────────────────────────
+    document.querySelectorAll('.hf-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('.hf-chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        currentFilter = chip.dataset.filter;
+        renderHistory();
+      });
+    });
+
+    // ── Load & render history ─────────────────────────────
+    async function loadHistory() {
+      const list = document.getElementById('history-list');
+      try {
+        allHistory = await DatBanApi.getMyHistory();
+        updateStats();
+        renderHistory();
+      } catch (err) {
+        list.innerHTML = `
+          <div class="history-empty">
+            <div class="history-empty__icon">⚠️</div>
+            <p style="color:var(--status-occupied)">${err.message}</p>
+          </div>`;
+      }
+    }
+
+    function updateStats() {
+      const total  = allHistory.length;
+      const paid   = allHistory.filter(r => ['paid','Paid','confirmed','Confirmed'].includes(r.trangThai)).length;
+      // Tổng chi từ chiTietDatMon nếu có
+      let spend = 0;
+      allHistory.forEach(r => {
+        if (r.chiTietDatMon?.length) {
+          r.chiTietDatMon.forEach(c => { spend += (c.gia || 0) * (c.soLuong || 1); });
+        }
+      });
+
+      document.getElementById('stat-total').textContent = total;
+      document.getElementById('stat-paid').textContent  = paid;
+      document.getElementById('stat-spend').textContent =
+        spend > 0 ? new Intl.NumberFormat('vi-VN', { notation:'compact', maximumFractionDigits:1 }).format(spend) + '₫' : '—';
+    }
+
+    function renderHistory() {
+      const list = document.getElementById('history-list');
+
+      const filtered = currentFilter === 'all'
+        ? allHistory
+        : allHistory.filter(r => r.trangThai?.toLowerCase() === currentFilter
+            || (currentFilter === 'paid' && ['paid','confirmed'].includes(r.trangThai?.toLowerCase())));
+
+      if (!filtered.length) {
+        list.innerHTML = `
+          <div class="history-empty">
+            <div class="history-empty__icon">📋</div>
+            <p style="font-weight:500;color:var(--text-secondary)">Chưa có đơn nào</p>
+            <p style="font-size:var(--text-sm);margin-top:var(--space-2)">
+              <a href="index.html#reservation">Đặt bàn ngay →</a>
+            </p>
+          </div>`;
+        return;
+      }
+
+      const badgeMap = {
+        pending:'badge-pending', confirmed:'badge-confirmed',
+        paid:'badge-confirmed',  cancelled:'badge-cancelled',
+      };
+      const labelMap = {
+        pending:'Chờ xác nhận', confirmed:'Đã xác nhận',
+        paid:'Đã thanh toán',   cancelled:'Đã hủy',
+      };
+
+      list.innerHTML = filtered.map(r => {
+        const st       = r.trangThai?.toLowerCase() || 'pending';
+        const dishes   = r.chiTietDatMon || [];
+        const total    = dishes.reduce((s, d) => s + (d.gia || 0) * (d.soLuong || 1), 0);
+        const canCancel = st === 'pending';
+
+        const dishesHTML = dishes.length
+          ? dishes.map(d => `
+              <div class="dish-row">
+                <div class="dish-row__img">
+                  ${d.monAn?.hinhAnh
+                    ? `<img src="${getImageUrl(d.monAn.hinhAnh)}" alt="${d.monAn?.tenMonAn || ''}" />`
+                    : '🍜'
+                  }
+                </div>
+                <div class="dish-row__name">${d.monAn?.tenMonAn || `Món #${d.monAnId}`}</div>
+                <div class="dish-row__qty">× ${d.soLuong}</div>
+                <div class="dish-row__price">${formatPrice((d.gia || 0) * d.soLuong)}</div>
+              </div>
+            `).join('')
+          : `<p style="color:var(--text-muted);font-size:var(--text-sm);padding:var(--space-3) 0">Không có chi tiết món ăn</p>`;
+
+        return `
+          <div class="res-card" id="res-${r.id}">
+            <div class="res-card__head" onclick="toggleRes(${r.id})">
+              <span class="res-card__id">#${r.id}</span>
+              <div>
+                <div class="res-card__table">Bàn ${r.banAnId}</div>
+                <div class="res-card__date">${formatDate(r.ngayDat)}</div>
+              </div>
+              <span class="badge ${badgeMap[st] || 'badge-pending'}">${labelMap[st] || r.trangThai}</span>
+              ${total > 0 ? `<span class="res-card__total">${formatPrice(total)}</span>` : ''}
+              <svg class="res-card__toggle" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </div>
+
+            <div class="res-card__detail">
+              <p style="font-size:var(--text-xs);letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:var(--space-4)">
+                Chi tiết món ăn
+              </p>
+              <div class="dish-list">${dishesHTML}</div>
+
+              ${total > 0 ? `
+                <div class="res-total-row">
+                  <span class="res-total-row__label">Tổng cộng</span>
+                  <span class="res-total-row__amount">${formatPrice(total)}</span>
+                </div>
+              ` : ''}
+
+              ${canCancel ? `
+                <div class="res-card__actions">
+                  <button class="btn btn-danger btn-sm" onclick="cancelRes(${r.id})">
+                    Hủy đặt bàn
+                  </button>
+                  <span style="font-size:var(--text-xs);color:var(--text-muted);align-self:center">
+                    Hành động này không thể hoàn tác
+                  </span>
+                </div>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // ── Toggle res card ───────────────────────────────────
+    window.toggleRes = function(id) {
+      document.getElementById(`res-${id}`)?.classList.toggle('expanded');
+    };
+
+    // ── Cancel reservation ────────────────────────────────
+    window.cancelRes = async function(id) {
+      if (!confirm(`Xác nhận hủy đơn đặt bàn #${id}?`)) return;
+      try {
+        await DatBanApi.cancel(id);
+        Toast.success('Đã hủy đặt bàn thành công');
+        await loadHistory();
+      } catch (err) {
+        Toast.error(err.message || 'Không thể hủy đơn này');
+      }
+    };
+
+    // ── Init ──────────────────────────────────────────────
+    await loadHistory();
+  </script>
+</body>
+</html>

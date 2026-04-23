@@ -1,16 +1,11 @@
 // ============================================================
 //  3TA RESTAURANT — MonAnComponent.js
 //  Dual-mode component: User (browse) / Admin (CRUD)
-//  Depends on: apiClient.js, shared.css
+//  Depends on: ../js/apiClient.js, ../js/services/authService.js, shared.css
 // ============================================================
 
-import api, {
-  MonAnApi,
-  Auth,
-  Toast,
-  getImageUrl,
-  formatPrice,
-} from './apiClient.js';
+import { Auth as AuthService } from '../js/services/authService.js';
+import { MonAnApi, Toast, getImageUrl, formatPrice } from '../js/apiClient.js';
 
 // ============================================================
 //  MonAnComponent  —  main export
@@ -30,7 +25,7 @@ export default class MonAnComponent {
       ? document.querySelector(container)
       : container;
 
-    this.isAdmin = options.admin ?? Auth.isAdmin();
+    this.isAdmin = options.admin ?? AuthService.isAdmin();
     this.items   = [];
     this.filtered = [];
     this.search  = '';
@@ -52,7 +47,15 @@ export default class MonAnComponent {
   async _loadItems() {
     this._setLoading(true);
     try {
-      this.items = await MonAnApi.getAll();
+      // Map PascalCase + camelCase API fields → camelCase for consistent UI code
+      this.items = (await MonAnApi.getAll()).map(item => ({
+        id:       item.Id ?? item.id ?? 0,
+        tenMonAn: item.TenMon ?? item.tenMon ?? item.tenMonAn ?? '',
+        gia:      item.Gia    ?? item.gia    ?? 0,
+        moTa:     item.MoTa   ?? item.moTa   ?? '',
+        hinhAnh:  item.HinhAnh ?? item.hinhAnh ?? '',
+        loai:     item.Loai   ?? item.loai   ?? '',
+      }));
       this.filtered = [...this.items];
       this._renderList();
     } catch (err) {
@@ -172,25 +175,33 @@ export default class MonAnComponent {
 
   // ── Card HTML ────────────────────────────────────────────────
   _cardHTML(item) {
-    const imgSrc = getImageUrl(item.hinhAnh);
-    const price  = formatPrice(item.gia);
+    // Defensive: ensure every field has a safe default
+    const id       = item.id       ?? '';
+    const tenMonAn = item.tenMonAn ?? item.TenMon ?? '';
+    const moTa     = item.moTa     ?? item.MoTa ?? '';
+    const gia      = item.gia      ?? item.Gia ?? '';
+    const hinhAnh  = item.hinhAnh  ?? item.HinhAnh ?? '';
+
+    const imgSrc = getImageUrl(hinhAnh);
+    const price  = formatPrice(gia);
+    const hasImg = hinhAnh && hinhAnh.trim() !== '';
 
     return `
-      <div class="card ${this.isAdmin ? 'card--admin' : 'card--user'}" data-id="${item.id}">
-        ${item.hinhAnh
-          ? `<img class="card__image" src="${imgSrc}" alt="${item.tenMonAn}" loading="lazy" onerror="this.parentNode.replaceChild(Object.assign(document.createElement('div'),{className:'card__image-placeholder',innerHTML:'🍜'}),this)">`
+      <div class="card ${this.isAdmin ? 'card--admin' : 'card--user'}" data-id="${id}">
+        ${hasImg
+          ? `<img class="card__image" src="${imgSrc}" alt="${tenMonAn}" loading="lazy" onerror="this.parentNode.replaceChild(Object.assign(document.createElement('div'),{className:'card__image-placeholder',innerHTML:'🍜'}),this)">`
           : `<div class="card__image-placeholder">🍜</div>`
         }
 
         ${this.isAdmin ? `
           <div class="card__actions">
-            <button class="btn btn-ghost btn-icon" data-action="edit" data-id="${item.id}" title="Chỉnh sửa">
+            <button class="btn btn-ghost btn-icon" data-action="edit" data-id="${id}" title="Chỉnh sửa">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
               </svg>
             </button>
-            <button class="btn btn-danger btn-icon" data-action="delete" data-id="${item.id}" title="Xoá">
+            <button class="btn btn-danger btn-icon" data-action="delete" data-id="${id}" title="Xoá">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/>
                 <path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/>
@@ -200,18 +211,18 @@ export default class MonAnComponent {
         ` : ''}
 
         <div class="card__body">
-          <h3 class="card__title">${item.tenMonAn}</h3>
-          <p class="card__desc">${item.moTa || 'Món ăn đặc sắc của nhà hàng 3TA'}</p>
+          <h3 class="card__title">${tenMonAn}</h3>
+          <p class="card__desc">${moTa}</p>
         </div>
 
         <div class="card__footer">
           <span class="card__price">${price}</span>
           ${!this.isAdmin ? `
-            <button class="btn btn-primary btn-sm" data-action="order" data-id="${item.id}">
+            <button class="btn btn-primary btn-sm" data-action="order" data-id="${id}">
               Đặt món
             </button>
           ` : `
-            <span style="font-size:var(--text-xs);color:var(--text-muted)">ID: ${item.id}</span>
+            <span style="font-size:var(--text-xs);color:var(--text-muted)">ID: ${id}</span>
           `}
         </div>
       </div>
@@ -312,13 +323,13 @@ export default class MonAnComponent {
     }
     if (!valid) return;
 
-    // Build FormData (backend dùng [FromForm])
+    // Build FormData (backend dùng [FromForm] — field name phải khớp backend CreateMonAnRequest)
     const fd = new FormData();
-    fd.append('tenMonAn', tenMonAn);
-    fd.append('gia',      gia);
-    fd.append('moTa',     form.moTa.value.trim());
+    fd.append('TenMon', tenMonAn);
+    fd.append('MoTa',   form.moTa.value.trim());
+    fd.append('Gia',    gia);
     if (form.hinhAnh.files[0]) {
-      fd.append('hinhAnh', form.hinhAnh.files[0]);
+      fd.append('HinhAnh', form.hinhAnh.files[0]);
     }
 
     submit.disabled = true;
