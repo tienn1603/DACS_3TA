@@ -258,6 +258,15 @@ export default class MonAnComponent {
                 value="${isEdit ? item.gia : ''}" />
               <span class="form-error" id="err-gia"></span>
             </div>
+            <div class="form-group">
+              <label class="form-label">Loại <span style="color:var(--status-occupied)">*</span></label>
+              <select class="form-select" name="loai" required>
+                <option value="">-- Chọn loại --</option>
+                <option value="Food"  ${isEdit && item.loai === 'Food'  ? 'selected' : ''}>Food</option>
+                <option value="Drink" ${isEdit && item.loai === 'Drink' ? 'selected' : ''}>Drink</option>
+              </select>
+              <span class="form-error" id="err-loai"></span>
+            </div>
 
             <div class="form-group">
               <label class="form-label">Mô tả</label>
@@ -309,6 +318,7 @@ export default class MonAnComponent {
     // Validate
     const tenMonAn = form.tenMonAn.value.trim();
     const gia      = parseFloat(form.gia.value);
+    const loai     = form.loai.value.trim();
     let valid      = true;
 
     document.querySelectorAll('.form-error').forEach(el => el.textContent = '');
@@ -321,15 +331,26 @@ export default class MonAnComponent {
       document.querySelector('#err-gia').textContent = 'Vui lòng nhập giá hợp lệ';
       valid = false;
     }
+    if (!loai) {
+      document.querySelector('#err-loai').textContent = 'Vui lòng chọn loại món ăn';
+      valid = false;
+    }
     if (!valid) return;
 
-    // Build FormData (backend dùng [FromForm] — field name phải khớp backend CreateMonAnRequest)
+    // Build FormData (backend dùng [FromForm] — field name phải khớp CreateMonAnRequest)
     const fd = new FormData();
     fd.append('TenMon', tenMonAn);
     fd.append('MoTa',   form.moTa.value.trim());
     fd.append('Gia',    gia);
+    fd.append('Loai',   loai);
+
+    // Khi edit: gửi ảnh cũ để giữ nguyên, chỉ thay khi có file mới
+    const existingItem = isEdit ? this.items.find(m => m.id === this._editingId) : null;
+    if (isEdit && !form.hinhAnh.files[0]) {
+      fd.append('HinhAnh', existingItem?.hinhAnh ?? '');
+    }
     if (form.hinhAnh.files[0]) {
-      fd.append('HinhAnh', form.hinhAnh.files[0]);
+      fd.append('HinhAnhFile', form.hinhAnh.files[0]);
     }
 
     submit.disabled = true;

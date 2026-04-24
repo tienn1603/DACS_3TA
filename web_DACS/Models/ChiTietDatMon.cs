@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace web_DACS.Models
 {
@@ -13,6 +14,7 @@ namespace web_DACS.Models
         public int DatBanId { get; set; }
 
         [ForeignKey("DatBanId")]
+        [JsonIgnore] // Ngăn chu kỳ: ChiTietDatMon → DatBan → ChiTietDatMons
         public virtual DatBan? DatBan { get; set; }
 
         [Required]

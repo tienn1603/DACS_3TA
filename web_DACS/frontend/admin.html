@@ -458,62 +458,12 @@
 
     <!-- ── Bàn Ăn Panel ───────────────────────────────── -->
     <div class="admin-panel" id="panel-banan">
-      <div class="section-header" style="margin-bottom:var(--space-6)">
-        <div>
-          <div class="wave-divider"></div>
-          <h2 class="section-title">Quản lý <em>Bàn ăn</em></h2>
-        </div>
-        <button class="btn btn-primary" id="btn-add-table" style="margin-left:auto">
-          + Thêm bàn
-        </button>
-      </div>
-
-      <div class="filter-bar" id="banan-filter">
-        <button class="filter-chip active" data-status="all">Tất cả</button>
-        <button class="filter-chip" data-status="available">Trống</button>
-        <button class="filter-chip" data-status="occupied">Đang dùng</button>
-        <button class="filter-chip" data-status="reserved">Đã đặt</button>
-      </div>
-
-      <div class="banan-grid" id="banan-grid">
-        <div class="loading-state" style="grid-column:1/-1"><div class="spinner"></div></div>
-      </div>
+      <div id="banan-root"></div>
     </div>
 
     <!-- ── Đặt Bàn Panel ──────────────────────────────── -->
     <div class="admin-panel" id="panel-datban">
-      <div class="section-header" style="margin-bottom:var(--space-6)">
-        <div>
-          <div class="wave-divider"></div>
-          <h2 class="section-title">Quản lý <em>Đặt bàn</em></h2>
-        </div>
-      </div>
-
-      <div class="filter-bar" id="datban-filter">
-        <button class="filter-chip active" data-filter="all">Tất cả</button>
-        <button class="filter-chip" data-filter="pending">Chờ xác nhận</button>
-        <button class="filter-chip" data-filter="confirmed">Đã xác nhận</button>
-        <button class="filter-chip" data-filter="paid">Đã thanh toán</button>
-        <button class="filter-chip" data-filter="cancelled">Đã hủy</button>
-      </div>
-
-      <div class="table-wrapper">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Khách hàng</th>
-              <th>Bàn</th>
-              <th>Ngày đặt</th>
-              <th>Trạng thái</th>
-              <th>Thao tác</th>
-            </tr>
-          </thead>
-          <tbody id="datban-tbody">
-            <tr><td colspan="6"><div class="loading-state" style="padding:var(--space-8)"><div class="spinner"></div></div></td></tr>
-          </tbody>
-        </table>
-      </div>
+      <div id="datban-root"></div>
     </div>
 
   </main>
@@ -536,6 +486,8 @@
     import { Auth } from './js/services/authService.js';
     import api, { MonAnApi, BanAnApi, DatBanApi, Toast, formatPrice, formatDate } from './js/apiClient.js';
   import MonAnComponent from './components/MonAnComponent.js';
+  import BanAnComponent from './components/BanAnComponent.js';
+  import DatBanComponent from './components/DatBanComponent.js';
 
   // Auth guard
   if (!Auth.isLoggedIn() || !Auth.isAdmin()) {
@@ -565,13 +517,24 @@
       document.getElementById(`panel-${panel}`).classList.add('active');
       document.getElementById('topbar-title').innerHTML = titleMap[panel] || panel;
 
-      if (panel === 'monan' && !monanLoaded) { loadMonAn(); monanLoaded = true; }
-      if (panel === 'banan')    loadBanAn();
-      if (panel === 'datban')   loadDatBan();
+      // Init component lazily (once per panel)
+      if (panel === 'monan')  getMonAnComp().init();
+      if (panel === 'banan')  getBanAnComp().init();
+      if (panel === 'datban') getDatBanComp().init();
     });
   });
 
-  // Mobile sidebar
+  // Refresh button — reload active component + dashboard
+  document.getElementById('btn-refresh').addEventListener('click', () => {
+    loadDashboard();
+    const activeId = document.querySelector('.admin-panel.active')?.id;
+    if (activeId === 'panel-monan')  getMonAnComp().reload();
+    if (activeId === 'panel-banan')  getBanAnComp().reload();
+    if (activeId === 'panel-datban') getDatBanComp().reload();
+    Toast.info('Đã làm mới dữ liệu');
+  });
+
+  // ── Mobile sidebar ────────────────────────────────────────
   const sidebar = document.getElementById('sidebar');
   document.getElementById('sidebar-toggle').addEventListener('click', () => {
     sidebar.classList.toggle('open');
@@ -588,16 +551,25 @@
     window.location.href = 'login.html';
   });
 
-  // Refresh
-  document.getElementById('btn-refresh').addEventListener('click', () => {
-    loadDashboard();
-    const active = document.querySelector('.admin-panel.active')?.id;
-    if (active === 'panel-banan')  loadBanAn();
-    if (active === 'panel-datban') loadDatBan();
-    Toast.info('Đã làm mới dữ liệu');
-  });
+  // ── Component instances ───────────────────────────────────
+  let monAnComp  = null;
+  let banAnComp  = null;
+  let datBanComp = null;
 
-  // ── DASHBOARD ────────────────────────────────────────
+  function getMonAnComp() {
+    if (!monAnComp) monAnComp = new MonAnComponent('#monan-root', { admin: true });
+    return monAnComp;
+  }
+  function getBanAnComp() {
+    if (!banAnComp) banAnComp = new BanAnComponent('#banan-root');
+    return banAnComp;
+  }
+  function getDatBanComp() {
+    if (!datBanComp) datBanComp = new DatBanComponent('#datban-root');
+    return datBanComp;
+  }
+
+  // ── Init ─────────────────────────────────────────────
   async function loadDashboard() {
     try {
       const [tables, reservations] = await Promise.all([
@@ -685,278 +657,31 @@
     }
   }
 
-  // ── MÓN ĂN ──────────────────────────────────────────
-  let monanLoaded = false;
-  function loadMonAn() {
-    const comp = new MonAnComponent('#monan-root', { admin: true });
-    comp.init();
-  }
+  // ── Panel switch ───────────────────────────────────────────
+  document.querySelectorAll('.sidebar__item[data-panel]').forEach(item => {
+    item.addEventListener('click', () => {
+      const panel = item.dataset.panel;
+      document.querySelectorAll('.sidebar__item').forEach(i => i.classList.remove('active'));
+      document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
+      item.classList.add('active');
+      document.getElementById(`panel-${panel}`).classList.add('active');
+      document.getElementById('topbar-title').innerHTML = titleMap[panel] || panel;
 
-  // ── BÀN ĂN ──────────────────────────────────────────
-  let allTables = [];
-  let banAnFilter = 'all';
-
-  async function loadBanAn() {
-    const grid = document.getElementById('banan-grid');
-    grid.innerHTML = `<div class="loading-state" style="grid-column:1/-1"><div class="spinner"></div></div>`;
-    try {
-      allTables = await BanAnApi.getAll();
-      renderBanAnGrid();
-    } catch (err) {
-      grid.innerHTML = `<p style="color:var(--status-occupied);grid-column:1/-1">${err.message}</p>`;
-    }
-  }
-
-  // trangThai: 0=Available, 1=Occupied, 2=Reserved
-  const banAnStatusLabel = { 0:'Trống', 1:'Đang dùng', 2:'Đã đặt' };
-  const banAnBadgeClass  = { 0:'badge-available', 1:'badge-occupied', 2:'badge-reserved' };
-  const banAnFilterMap   = { all: null, available: 0, occupied: 1, reserved: 2 };
-
-  function renderBanAnGrid() {
-    const grid = document.getElementById('banan-grid');
-    const numericStatus = banAnFilterMap[banAnFilter] ?? null;
-    const filtered = numericStatus === null
-      ? allTables
-      : allTables.filter(t => (t.TrangThai ?? t.trangThai) === numericStatus);
-
-    if (!filtered.length) {
-      grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="empty-state__icon">🪑</div><p>Không có bàn nào</p></div>`;
-      return;
-    }
-
-    grid.innerHTML = filtered.map(t => {
-      const st = t.TrangThai ?? t.trangThai;
-      const soBan = t.SoBan ?? t.soBan ?? '?';
-      const soCho = t.SoChoNgoi ?? t.soChoNgoi ?? '?';
-      return `
-        <div class="banan-card ${banAnStatusLabel[st] ? banAnStatusLabel[st].toLowerCase().replace(' ', '-') : 'available'}" data-id="${t.Id ?? t.id}">
-          <div class="banan-card__num">${soBan}</div>
-          <div class="banan-card__seats">${soCho} chỗ ngồi</div>
-          <span class="badge ${banAnBadgeClass[st] || 'badge-available'}">${banAnStatusLabel[st] || (st ?? '?')}</span>
-          <div style="display:flex;gap:var(--space-2);margin-top:var(--space-3)">
-            <button class="btn btn-ghost btn-sm" style="flex:1;font-size:11px" data-edit="${t.Id ?? t.id}">Sửa</button>
-            <button class="btn btn-danger btn-sm" style="font-size:11px" data-delete="${t.Id ?? t.id}" title="Xóa bàn">✕</button>
-          </div>
-        </div>
-      `;
-    }).join('');
-
-    grid.querySelectorAll('[data-edit]').forEach(btn => {
-      const id = parseInt(btn.dataset.edit);
-      btn.addEventListener('click', () => openBanAnModal(allTables.find(t => (t.Id ?? t.id) === id)));
-    });
-
-    grid.querySelectorAll('[data-delete]').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        const id = parseInt(btn.dataset.delete);
-        if (!confirm(`Xóa bàn #${id}?`)) return;
-        btn.disabled = true;
-        try {
-          await BanAnApi.delete(id);
-          Toast.success('Đã xóa bàn');
-          await loadBanAn();
-          loadDashboard();
-        } catch (err) {
-          Toast.error(err.message || 'Xóa thất bại');
-          btn.disabled = false;
-        }
-      });
-    });
-  }
-
-  document.getElementById('banan-filter').querySelectorAll('.filter-chip').forEach(chip => {
-    chip.addEventListener('click', () => {
-      document.querySelectorAll('#banan-filter .filter-chip').forEach(c => c.classList.remove('active'));
-      chip.classList.add('active');
-      banAnFilter = chip.dataset.status;
-      renderBanAnGrid();
+      // Init component lazily (once per panel)
+      if (panel === 'monan')  getMonAnComp().init();
+      if (panel === 'banan')  getBanAnComp().init();
+      if (panel === 'datban') getDatBanComp().init();
     });
   });
 
-  function openBanAnModal(table) {
-    const modal = document.getElementById('banan-modal');
-    const body  = document.getElementById('banan-modal-body');
-    const isNew = !table;
-
-    document.querySelector('#banan-modal .modal__title').textContent = isNew ? 'Thêm bàn ăn' : 'Cập nhật bàn ăn';
-
-    body.innerHTML = `
-      <div class="form-group">
-        <label class="form-label">Số bàn</label>
-        <input class="form-input" id="edit-Soban" type="text" value="${isNew ? '' : (table.SoBan ?? table.soBan ?? '')}" placeholder="${isNew ? 'VD: B01, B-3' : ''}" />
-      </div>
-      <div class="form-group">
-        <label class="form-label">Số chỗ ngồi</label>
-        <input class="form-input" id="edit-socho" type="number" min="1" value="${isNew ? '' : (table.SoChoNgoi ?? table.soChoNgoi ?? '')}" placeholder="${isNew ? 'VD: 4' : ''}" />
-      </div>
-      ${isNew ? '' : `
-      <div class="form-group">
-        <label class="form-label">Trạng thái</label>
-        <select class="form-select" id="edit-trangthai">
-          <option value="0" ${!table || (table.TrangThai ?? table.trangThai) === 0 ? 'selected' : ''}>Trống</option>
-          <option value="1" ${!table || (table.TrangThai ?? table.trangThai) === 1 ? 'selected' : ''}>Đang dùng</option>
-          <option value="2" ${!table || (table.TrangThai ?? table.trangThai) === 2 ? 'selected' : ''}>Đã đặt</option>
-        </select>
-      </div>
-      `}
-      <div style="display:flex;gap:var(--space-3);justify-content:flex-end">
-        <button class="btn btn-ghost" id="banan-modal-cancel">Huỷ</button>
-        <button class="btn btn-primary" id="banan-modal-save">${isNew ? 'Thêm' : 'Lưu'}</button>
-      </div>
-    `;
-
-    modal.style.display = 'flex';
-
-    const close = () => { modal.style.display = 'none'; };
-    document.getElementById('banan-modal-close').onclick  = close;
-    document.getElementById('banan-modal-cancel').onclick = close;
-    modal.addEventListener('click', e => { if (e.target === modal) close(); });
-
-    document.getElementById('banan-modal-save').addEventListener('click', async () => {
-      const btn = document.getElementById('banan-modal-save');
-      btn.disabled = true; btn.textContent = 'Đang lưu…';
-      try {
-        if (isNew) {
-          await BanAnApi.create({
-            SoBan:     document.getElementById('edit-Soban').value.trim(),
-            SoChoNgoi: parseInt(document.getElementById('edit-socho').value) || 0,
-          });
-          Toast.success('Thêm bàn thành công');
-        } else {
-          await BanAnApi.update(table.Id ?? table.id, {
-            SoBan:     document.getElementById('edit-Soban').value.trim(),
-            SoChoNgoi: parseInt(document.getElementById('edit-socho').value) || 0,
-            TrangThai: parseInt(document.getElementById('edit-trangthai').value) || 0,
-          });
-          Toast.success('Cập nhật bàn thành công');
-        }
-        close();
-        await loadBanAn();
-        loadDashboard();
-      } catch (err) {
-        Toast.error(err.message || 'Thao tác thất bại');
-        btn.disabled = false; btn.textContent = isNew ? 'Thêm' : 'Lưu';
-      }
-    });
-  }
-
-  document.getElementById('btn-add-table').addEventListener('click', () => openBanAnModal(null));
-
-  // ── ĐẶT BÀN ─────────────────────────────────────────
-  let allReservations = [];
-  let datBanFilter = 'all';
-
-  async function loadDatBan() {
-    const tbody = document.getElementById('datban-tbody');
-    tbody.innerHTML = `<tr><td colspan="6"><div class="loading-state" style="padding:var(--space-8)"><div class="spinner"></div></div></td></tr>`;
-    try {
-      allReservations = await DatBanApi.getAll();
-      renderDatBanTable();
-    } catch (err) {
-      tbody.innerHTML = `<tr><td colspan="6" style="color:var(--status-occupied);padding:var(--space-6)">${err.message}</td></tr>`;
-    }
-  }
-
-  // trangThai: 0=Pending, 1=Confirmed, 2=Occupied, 3=Expired, -1=Cancelled
-  const datBanBadgeMap = { 0:'badge-pending', 1:'badge-confirmed', 2:'badge-reserved', 3:'badge-reserved', '-1':'badge-cancelled' };
-  const datBanLabelMap = { 0:'Chờ xác nhận', 1:'Đã xác nhận', 2:'Đang dùng', 3:'Hết hạn', '-1':'Đã hủy' };
-  const datBanFilterMap = { all: null, pending: 0, confirmed: 1, paid: 2, cancelled: -1 };
-
-  function renderDatBanTable() {
-    const tbody = document.getElementById('datban-tbody');
-    const numericStatus = datBanFilterMap[datBanFilter] ?? null;
-    const filtered = numericStatus === null
-      ? allReservations
-      : allReservations.filter(r => (r.TrangThai ?? r.trangThai) === numericStatus);
-
-    if (!filtered.length) {
-      tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state" style="padding:var(--space-8)"><div class="empty-state__icon">📋</div><p>Không có đơn nào</p></div></td></tr>`;
-      return;
-    }
-
-    tbody.innerHTML = filtered.map(r => {
-      const st = r.TrangThai ?? r.trangThai;
-      return `
-        <tr>
-          <td style="font-family:var(--font-mono);font-size:var(--text-xs);color:var(--text-muted)">#${r.Id ?? r.id}</td>
-          <td style="color:var(--text-primary)">
-            <div style="font-weight:500">${r.TenKhachHang ?? r.tenKhachHang ?? '?'}</div>
-            <div style="font-size:var(--text-xs);color:var(--text-muted)">${r.SoDienThoai ?? r.soDienThoai ?? '?'}</div>
-          </td>
-          <td>Bàn ${r.BanAnId ?? r.banAnId ?? '?'}</td>
-          <td>${formatDate(r.NgayDat ?? r.ngayDat)}</td>
-          <td><span class="badge ${datBanBadgeMap[st] || 'badge-pending'}">${datBanLabelMap[st] || (st ?? '?')}</span></td>
-          <td>
-            <div style="display:flex;gap:var(--space-2);align-items:center">
-              ${st === 0 ? `
-                <button class="btn btn-primary btn-sm" data-confirm-booking="${r.Id ?? r.id}" title="Xác nhận đặt bàn">✓</button>
-                <button class="btn btn-danger btn-sm" data-cancel-id="${r.Id ?? r.id}">Hủy</button>
-              ` : st === 1 ? `
-                <button class="btn btn-success btn-sm" data-pay="${r.Id ?? r.id}" title="Xác nhận thanh toán">TT</button>
-                <button class="btn btn-danger btn-sm" data-cancel-id="${r.Id ?? r.id}">Hủy</button>
-              ` : '—'}
-            </div>
-          </td>
-        </tr>
-      `;
-    }).join('');
-
-    tbody.querySelectorAll('[data-confirm-booking]').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        if (!confirm('Xác nhận đơn đặt bàn #' + btn.dataset.confirmBooking + '?')) return;
-        btn.disabled = true; btn.textContent = '…';
-        try {
-          await DatBanApi.confirmBooking(parseInt(btn.dataset.confirmBooking));
-          Toast.success('Đã xác nhận đặt bàn');
-          await loadDatBan();
-          loadDashboard();
-        } catch (err) {
-          Toast.error(err.message || 'Lỗi xác nhận');
-          btn.disabled = false; btn.textContent = '✓';
-        }
-      });
-    });
-
-    tbody.querySelectorAll('[data-pay]').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        if (!confirm('Xác nhận thanh toán cho đơn #' + btn.dataset.pay + '?')) return;
-        btn.disabled = true; btn.textContent = '…';
-        try {
-          await DatBanApi.confirmPayment(parseInt(btn.dataset.pay));
-          Toast.success('Đã thanh toán và giải phóng bàn');
-          await loadDatBan();
-          loadDashboard();
-        } catch (err) {
-          Toast.error(err.message || 'Lỗi thanh toán');
-          btn.disabled = false; btn.textContent = 'TT';
-        }
-      });
-    });
-
-    tbody.querySelectorAll('[data-cancel-id]').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        if (!confirm('Hủy đơn đặt bàn #' + btn.dataset.cancelId + '?')) return;
-        btn.disabled = true; btn.textContent = '…';
-        try {
-          await DatBanApi.cancel(btn.dataset.cancelId);
-          Toast.success('Đã hủy đơn');
-          await loadDatBan();
-          loadDashboard();
-        } catch (err) {
-          Toast.error(err.message || 'Lỗi hủy đơn');
-          btn.disabled = false; btn.textContent = 'Hủy';
-        }
-      });
-    });
-  }
-
-  document.getElementById('datban-filter').querySelectorAll('.filter-chip').forEach(chip => {
-    chip.addEventListener('click', () => {
-      document.querySelectorAll('#datban-filter .filter-chip').forEach(c => c.classList.remove('active'));
-      chip.classList.add('active');
-      datBanFilter = chip.dataset.filter;
-      renderDatBanTable();
-    });
+  // Refresh button — reload active component + dashboard
+  document.getElementById('btn-refresh').addEventListener('click', () => {
+    loadDashboard();
+    const activeId = document.querySelector('.admin-panel.active')?.id;
+    if (activeId === 'panel-monan')  getMonAnComp().reload();
+    if (activeId === 'panel-banan')  getBanAnComp().reload();
+    if (activeId === 'panel-datban') getDatBanComp().reload();
+    Toast.info('Đã làm mới dữ liệu');
   });
 
   // ── Init ─────────────────────────────────────────────
