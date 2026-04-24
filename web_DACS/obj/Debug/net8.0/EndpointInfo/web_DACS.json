@@ -272,6 +272,29 @@
         }
       }
     },
+    "/api/DatBan/ConfirmBooking/{id}": {
+      "post": {
+        "tags": [
+          "DatBan"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/DatBan/my-history": {
       "get": {
         "tags": [
@@ -353,6 +376,9 @@
                   "HinhAnhFile": {
                     "type": "string",
                     "format": "binary"
+                  },
+                  "HinhAnh": {
+                    "type": "string"
                   }
                 }
               },
@@ -370,6 +396,9 @@
                   "style": "form"
                 },
                 "HinhAnhFile": {
+                  "style": "form"
+                },
+                "HinhAnh": {
                   "style": "form"
                 }
               }
@@ -460,6 +489,80 @@
             }
           }
         ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/MonAn/{id}/with-image": {
+      "put": {
+        "tags": [
+          "MonAn"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "TenMon": {
+                    "type": "string"
+                  },
+                  "MoTa": {
+                    "type": "string"
+                  },
+                  "Gia": {
+                    "type": "number",
+                    "format": "double"
+                  },
+                  "Loai": {
+                    "type": "string"
+                  },
+                  "HinhAnhFile": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "HinhAnh": {
+                    "type": "string"
+                  }
+                }
+              },
+              "encoding": {
+                "TenMon": {
+                  "style": "form"
+                },
+                "MoTa": {
+                  "style": "form"
+                },
+                "Gia": {
+                  "style": "form"
+                },
+                "Loai": {
+                  "style": "form"
+                },
+                "HinhAnhFile": {
+                  "style": "form"
+                },
+                "HinhAnh": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK"

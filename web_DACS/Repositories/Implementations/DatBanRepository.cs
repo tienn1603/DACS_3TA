@@ -17,6 +17,7 @@ namespace web_DACS.Repositories.Implementations
         {
             return await _context.DatBans
                 .Include(d => d.BanAn)
+                .Include(d => d.ChiTietDatMons).ThenInclude(ct => ct.MonAn)
                 .OrderByDescending(d => d.NgayDat)
                 .ToListAsync();
         }
@@ -25,6 +26,7 @@ namespace web_DACS.Repositories.Implementations
         {
             return await _context.DatBans
                 .Include(d => d.BanAn)
+                .Include(d => d.ChiTietDatMons).ThenInclude(ct => ct.MonAn)
                 .FirstOrDefaultAsync(m => m.Id == id);
         }
 
@@ -149,6 +151,7 @@ namespace web_DACS.Repositories.Implementations
         {
             return await _context.DatBans
                 .Include(d => d.BanAn)
+                .Include(d => d.ChiTietDatMons).ThenInclude(ct => ct.MonAn)
                 .Where(d => d.UserId == userId)
                 .OrderByDescending(d => d.NgayDat)
                 .ToListAsync();

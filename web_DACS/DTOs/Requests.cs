@@ -48,6 +48,7 @@ namespace web_DACS.DTOs
         public decimal Gia { get; set; }
         public string? Loai { get; set; }
         public IFormFile? HinhAnhFile { get; set; }
+        public string? HinhAnh { get; set; }
 
         public bool IsImageFileValid(out string? errorMessage)
         {

@@ -101,7 +101,7 @@ export const MonAnApi = {
   getAll:   () => get('/api/MonAn', { auth: false }),
   getById:  (id) => get(`/api/MonAn/${id}`, { auth: false }),
   create:   (formData) => postForm('/api/MonAn', formData),
-  update:   (id, formData) => request(`/api/MonAn/${id}`, { method: 'PUT', body: formData, isForm: true }),
+  update:   (id, formData) => request(`/api/MonAn/${id}/with-image`, { method: 'PUT', body: formData, isForm: true }),
   delete:   (id) => del(`/api/MonAn/${id}`),
 };
 

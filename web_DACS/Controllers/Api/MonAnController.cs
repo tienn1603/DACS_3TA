@@ -77,6 +77,21 @@ namespace web_DACS.Controllers.Api
             return result; // Trả thẳng ApiResponse, KHÔNG bọc thêm Ok()
         }
 
+        [HttpPut("{id}/with-image")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdateMonAnWithImage(int id, [FromForm] CreateMonAnRequest request)
+        {
+            string? imageFileName = null;
+            if (request.HinhAnhFile != null && request.HinhAnhFile.Length > 0)
+                imageFileName = await SaveImageAsync(request.HinhAnhFile);
+
+            var result = await _monAnService.UpdateAsync(
+                id, request.TenMon, request.MoTa, request.Gia, request.Loai,
+                imageFileName ?? request.HinhAnh);
+            if (!result.Status) return result;
+            return result;
+        }
+
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteMonAn(int id)

@@ -113,7 +113,7 @@ if (app.Environment.IsDevelopment())
 
 // HTTPS redirection must come BEFORE static files so that /frontend/... URLs
 // are not intercepted and redirected before the static file middleware runs.
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseStaticFiles(new StaticFileOptions
 {
