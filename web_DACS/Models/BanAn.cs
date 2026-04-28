@@ -18,5 +18,10 @@ namespace web_DACS.Models
 
         [NotMapped]
         public DatBan? ActiveDatBan { get; set; }
+
+        [NotMapped]
+        public string TimeRange => ActiveDatBan != null
+            ? $"{ActiveDatBan.GioDenDuyKien:HH:mm} - {ActiveDatBan.GioDenDuyKien.AddHours(2):HH:mm}"
+            : string.Empty;
     }
 }

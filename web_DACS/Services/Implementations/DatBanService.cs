@@ -8,6 +8,7 @@ namespace web_DACS.Services.Implementations
     {
         private readonly IDatBanRepository _datBanRepo;
         private readonly IMonAnRepository _monAnRepo;
+        private readonly IBanAnRepository _banAnRepo;
 
         public DatBanService(IDatBanRepository datBanRepo, IMonAnRepository monAnRepo)
         {
@@ -30,19 +31,20 @@ namespace web_DACS.Services.Implementations
         }
 
         public async Task<ApiResponse> CreateAsync(
-            string tenKhachHang,
-            string soDienThoai,
-            DateTime gioDenDuyKien,
-            int banAnId,
-            string userId,
-            bool isBlocked,
-            List<(int MonAnId, int SoLuong)> cartItems)
+     string tenKhachHang,
+     string soDienThoai,
+     DateTime gioDenDuyKien,
+     int banAnId,
+     string userId,
+     bool isBlocked,
+     List<(int MonAnId, int SoLuong)> cartItems)
         {
             if (isBlocked)
-                return ApiResponse.Fail("Tài khoản bị chặn.");
+                return ApiResponse.Fail("Tài khoản của bạn hiện đang bị chặn.");
 
+            // Kiểm tra giới hạn đặt đơn
             if (await _datBanRepo.GetActiveBookingCountByUserAsync(userId) >= 2)
-                return ApiResponse.Fail("Vượt quá giới hạn đặt bàn.");
+                return ApiResponse.Fail("Bạn đã có 2 đơn đặt bàn đang chờ, không thể đặt thêm.");
 
             var datBan = new DatBan
             {
@@ -52,11 +54,25 @@ namespace web_DACS.Services.Implementations
                 BanAnId = banAnId,
                 UserId = userId,
                 NgayDat = DateTime.Now,
-                TrangThai = 0
+                TrangThai = 0 // Đang chờ (Pending)
             };
 
-            await _datBanRepo.CreateWithDetailsAsync(datBan, cartItems);
-            return ApiResponse.Ok("Thành công!", new { bookingId = datBan.Id });
+            try
+            {
+                // Gọi Repo để xử lý Transaction
+                await _datBanRepo.CreateWithDetailsAsync(datBan, cartItems);
+                return ApiResponse.Ok("Đặt bàn thành công! Bàn của bạn đã được giữ chỗ.", new { bookingId = datBan.Id });
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Bắt lỗi logic "Bàn đã bị đặt" từ Repository
+                return ApiResponse.Fail(ex.Message);
+            }
+            catch (Exception)
+            {
+                // Bắt các lỗi hệ thống khác
+                return ApiResponse.Fail("Đã xảy ra lỗi trong quá trình xử lý đơn đặt bàn.");
+            }
         }
 
         public async Task<ApiResponse> ConfirmPaymentAsync(int datBanId)
@@ -88,16 +104,17 @@ namespace web_DACS.Services.Implementations
             var now = DateTime.Now;
             var expiredBookings = await _datBanRepo.GetExpiredPendingBookingsAsync(now);
 
+            int count = 0;
             foreach (var booking in expiredBookings)
             {
-                booking.TrangThai = 3;
-                if (booking.BanAn != null) booking.BanAn.TrangThai = 0;
+                var success = await _datBanRepo.CancelPendingBookingAsync(booking.Id, booking.UserId);
+                if (success)
+                {
+                    count++;
+                }
             }
 
-            if (expiredBookings.Count > 0)
-                await _datBanRepo.SaveChangesAsync();
-
-            return ApiResponse.Ok($"Đã xử lý {expiredBookings.Count} đơn quá hạn.");
+            return ApiResponse.Ok($"Đã xử lý giải phóng {count} đơn quá hạn.");
         }
 
         public async Task<ApiResponse> ConfirmBookingAsync(int datBanId)
@@ -106,5 +123,6 @@ namespace web_DACS.Services.Implementations
             if (!success) return ApiResponse.Fail("Không tìm thấy đơn chờ xác nhận.");
             return ApiResponse.Ok("Đã xác nhận đặt bàn, bàn được chuyển sang trạng thái sử dụng.");
         }
+
     }
 }

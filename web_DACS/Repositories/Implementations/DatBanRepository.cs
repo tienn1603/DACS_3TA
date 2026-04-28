@@ -47,11 +47,10 @@ namespace web_DACS.Repositories.Implementations
         public async Task<List<DatBan>> GetExpiredPendingBookingsAsync(DateTime now)
         {
             return await _context.DatBans
-                .Include(d => d.BanAn)
-                .Where(d => d.TrangThai == 0 && now > d.GioDenDuyKien.AddMinutes(1))
+                .Where(b => b.TrangThai == 0 
+                       && b.GioDenDuyKien.AddMinutes(1) < now)
                 .ToListAsync();
         }
-
         public async Task<DatBan?> GetActiveBookingForTableAsync(int banAnId, string? userId, bool isAdmin)
         {
             return await _context.DatBans
@@ -62,24 +61,28 @@ namespace web_DACS.Repositories.Implementations
 
         public async Task<DatBan> CreateWithDetailsAsync(DatBan datBan, IEnumerable<(int MonAnId, int SoLuong)> cartItems)
         {
-            await using IDbContextTransaction transaction = await _context.Database.BeginTransactionAsync();
+            using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                await _context.DatBans.AddAsync(datBan);
-                await _context.SaveChangesAsync();
-
-                var ban = await _context.BanAns.FirstOrDefaultAsync(b => b.Id == datBan.BanAnId);
-                if (ban == null)
+                // 1. Kiểm tra bàn và khóa bàn ngay lập tức
+                var ban = await _context.BanAns.FindAsync(datBan.BanAnId);
+                if (ban == null || ban.TrangThai != 0)
                 {
-                    throw new InvalidOperationException("Không tìm thấy bàn ăn để cập nhật trạng thái.");
+                    throw new Exception("Bàn đã có người khác đặt hoặc không tồn tại.");
                 }
 
+                // 2. Đổi trạng thái bàn thành 2 (Đã đặt)
                 ban.TrangThai = 2;
                 _context.BanAns.Update(ban);
 
+                // 3. Lưu đơn đặt bàn
+                _context.DatBans.Add(datBan);
+                await _context.SaveChangesAsync();
+
+                // 4. Lưu chi tiết món (Giữ nguyên code cũ của bạn)
                 foreach (var item in cartItems)
                 {
-                    await _context.ChiTietDatMons.AddAsync(new ChiTietDatMon
+                    _context.ChiTietDatMons.Add(new ChiTietDatMon
                     {
                         DatBanId = datBan.Id,
                         MonAnId = item.MonAnId,
@@ -92,7 +95,7 @@ namespace web_DACS.Repositories.Implementations
                 await transaction.CommitAsync();
                 return datBan;
             }
-            catch
+            catch (Exception)
             {
                 await transaction.RollbackAsync();
                 throw;

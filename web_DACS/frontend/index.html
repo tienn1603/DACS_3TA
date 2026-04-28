@@ -475,542 +475,592 @@
 </head>
 <body>
 
-  <!-- Navbar -->
-  <nav class="navbar">
-    <div class="navbar__brand">
-      <span style="font-size:1.4rem">🌊</span>
-      3<span class="accent">T</span>A
-    </div>
-    <ul class="navbar__nav">
-      <li><a href="#menu" class="active">Thực đơn</a></li>
-      <li><a href="#reservation">Đặt bàn</a></li>
-      <li><a href="#history" id="nav-history" style="display:none">Lịch sử</a></li>
-    </ul>
-    <div class="navbar__actions" id="navbar-actions">
-      <!-- injected by JS -->
-    </div>
-  </nav>
-
-  <!-- Hero -->
-  <section class="hero">
-    <div class="hero__bg"></div>
-    <div class="hero__grid"></div>
-
-    <div class="hero__content">
-      <div class="hero__eyebrow">
-        <span>🌊</span> Nhà hàng ven biển · Hồ Chí Minh
-      </div>
-      <h1 class="hero__title">
-        Hương vị<br/><em>đại dương</em>
-      </h1>
-      <p class="hero__subtitle">
-        Thưởng thức những món hải sản tươi ngon nhất, được chế biến tinh tế
-        bởi những đầu bếp hàng đầu ngay bên bờ biển.
-      </p>
-      <div class="hero__ctas">
-        <a href="#menu" class="btn btn-primary btn-lg">Xem thực đơn</a>
-        <a href="#reservation" class="btn btn-secondary btn-lg">Đặt bàn ngay</a>
-      </div>
-    </div>
-
-    <div class="hero__scroll">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M12 5v14M5 12l7 7 7-7"/>
-      </svg>
-      Cuộn xuống
-    </div>
-  </section>
-
-  <!-- Stats -->
-  <div class="stats-bar">
-    <div class="stats-bar__inner">
-      <div class="stat-item">
-        <div class="stat-item__num">50+</div>
-        <div class="stat-item__label">Món ăn đặc sắc</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-item__num" id="stat-tables">—</div>
-        <div class="stat-item__label">Bàn ăn</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-item__num">10+</div>
-        <div class="stat-item__label">Năm kinh nghiệm</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-item__num">4.9★</div>
-        <div class="stat-item__label">Đánh giá khách hàng</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Menu Section -->
-  <section class="section" id="menu">
-    <div class="container">
-      <div class="section-header">
-        <div>
-          <div class="wave-divider"></div>
-          <h2 class="section-title">Thực <em>đơn</em></h2>
-          <p class="section-subtitle">Chọn món yêu thích & thêm vào giỏ hàng</p>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar__brand">
+            <span style="font-size:1.4rem">🌊</span>
+            3<span class="accent">T</span>A
         </div>
-      </div>
-      <div id="menu-root"></div>
-    </div>
-  </section>
-
-  <!-- Reservation Section -->
-  <section class="section reservation-section" id="reservation">
-    <div class="container">
-      <div class="reservation-layout">
-        <!-- Info -->
-        <div>
-          <div class="wave-divider"></div>
-          <h2 class="reservation-info__title">
-            Đặt <em>bàn</em><br/>trực tuyến
-          </h2>
-          <p class="reservation-info__desc">
-            Chọn bàn yêu thích, thêm món ăn và đặt chỗ ngay — nhanh chóng, dễ dàng,
-            không cần gọi điện.
-          </p>
-          <ul class="feature-list">
-            <li>Chọn bàn theo sơ đồ thực tế của nhà hàng</li>
-            <li>Đặt trước món ăn để tiết kiệm thời gian chờ</li>
-            <li>Xác nhận tức thì qua hệ thống</li>
-            <li>Hủy hoặc thay đổi dễ dàng trong mục lịch sử</li>
-          </ul>
+        <ul class="navbar__nav">
+            <li><a href="#menu" class="active">Thực đơn</a></li>
+            <li><a href="#reservation">Đặt bàn</a></li>
+            <li><a href="#history" id="nav-history" style="display:none">Lịch sử</a></li>
+        </ul>
+        <div class="navbar__actions" id="navbar-actions">
+            <!-- injected by JS -->
         </div>
+    </nav>
 
-        <!-- Form Card -->
-        <div class="reservation-card">
-          <h3 class="reservation-card__title">🍽️ Đặt bàn của bạn</h3>
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero__bg"></div>
+        <div class="hero__grid"></div>
 
-          <div class="form-group">
-            <label class="form-label">Họ tên khách hàng <span style="color:var(--status-occupied)">*</span></label>
-            <input class="form-input" type="text" id="res-name" placeholder="Nhập họ tên của bạn" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Số điện thoại <span style="color:var(--status-occupied)">*</span></label>
-            <input class="form-input" type="tel" id="res-phone" placeholder="0xxx xxx xxx" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Chọn ngày & giờ <span style="color:var(--status-occupied)">*</span></label>
-            <input class="form-input" type="datetime-local" id="res-date" />
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">Chọn bàn <span style="color:var(--status-occupied)">*</span></label>
-            <div class="table-legend">
-              <div class="table-legend__item">
-                <div class="legend-dot" style="background:var(--bg-surface);border:1px solid var(--border-subtle)"></div>
-                Trống
-              </div>
-              <div class="table-legend__item">
-                <div class="legend-dot" style="background:rgba(42,171,184,0.15);border:1px solid var(--accent-primary)"></div>
-                Đã chọn
-              </div>
-              <div class="table-legend__item">
-                <div class="legend-dot" style="background:rgba(224,92,92,0.15);border:1px solid var(--status-occupied)"></div>
-                Đã đặt / Đang dùng
-              </div>
+        <div class="hero__content">
+            <div class="hero__eyebrow">
+                <span>🌊</span> Nhà hàng ven biển · Hồ Chí Minh
             </div>
-            <div class="table-grid" id="table-grid">
-              <div class="loading-state" style="grid-column:1/-1;padding:var(--space-8)">
-                <div class="spinner"></div>
-              </div>
+            <h1 class="hero__title">
+                Hương vị<br /><em>đại dương</em>
+            </h1>
+            <p class="hero__subtitle">
+                Thưởng thức những món hải sản tươi ngon nhất, được chế biến tinh tế
+                bởi những đầu bếp hàng đầu ngay bên bờ biển.
+            </p>
+            <div class="hero__ctas">
+                <a href="#menu" class="btn btn-primary btn-lg">Xem thực đơn</a>
+                <a href="#reservation" class="btn btn-secondary btn-lg">Đặt bàn ngay</a>
             </div>
-          </div>
-
-          <!-- Selected dishes summary -->
-          <div id="dishes-summary" style="display:none">
-            <div class="form-group" style="margin-bottom:0">
-              <label class="form-label">Món đã chọn</label>
-              <div id="dishes-list" style="display:flex;flex-direction:column;gap:var(--space-2);margin-top:var(--space-2)"></div>
-            </div>
-            <div class="divider"></div>
-          </div>
-
-          <button class="btn btn-primary" style="width:100%;justify-content:center" id="btn-reserve">
-            Xác nhận đặt bàn
-          </button>
-          <p style="text-align:center;font-size:var(--text-xs);color:var(--text-muted);margin-top:var(--space-3)">
-            Bạn cần <a href="login.html">đăng nhập</a> để đặt bàn
-          </p>
         </div>
-      </div>
-    </div>
-  </section>
 
-  <!-- Order History -->
-  <section class="section" id="history" style="display:none">
-    <div class="container">
-      <div class="section-header">
+        <div class="hero__scroll">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 5v14M5 12l7 7 7-7" />
+            </svg>
+            Cuộn xuống
+        </div>
+    </section>
+
+    <!-- Stats -->
+    <div class="stats-bar">
+        <div class="stats-bar__inner">
+            <div class="stat-item">
+                <div class="stat-item__num">50+</div>
+                <div class="stat-item__label">Món ăn đặc sắc</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-item__num" id="stat-tables">—</div>
+                <div class="stat-item__label">Bàn ăn</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-item__num">10+</div>
+                <div class="stat-item__label">Năm kinh nghiệm</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-item__num">4.9★</div>
+                <div class="stat-item__label">Đánh giá khách hàng</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menu Section -->
+    <section class="section" id="menu">
+        <div class="container">
+            <div class="section-header">
+                <div>
+                    <div class="wave-divider"></div>
+                    <h2 class="section-title">Thực <em>đơn</em></h2>
+                    <p class="section-subtitle">Chọn món yêu thích & thêm vào giỏ hàng</p>
+                </div>
+            </div>
+            <div id="menu-root"></div>
+        </div>
+    </section>
+
+    <!-- Reservation Section -->
+    <section class="section reservation-section" id="reservation">
+        <div class="container">
+            <div class="reservation-layout">
+                <!-- Info -->
+                <div>
+                    <div class="wave-divider"></div>
+                    <h2 class="reservation-info__title">
+                        Đặt <em>bàn</em><br />trực tuyến
+                    </h2>
+                    <p class="reservation-info__desc">
+                        Chọn bàn yêu thích, thêm món ăn và đặt chỗ ngay — nhanh chóng, dễ dàng,
+                        không cần gọi điện.
+                    </p>
+                    <ul class="feature-list">
+                        <li>Chọn bàn theo sơ đồ thực tế của nhà hàng</li>
+                        <li>Đặt trước món ăn để tiết kiệm thời gian chờ</li>
+                        <li>Xác nhận tức thì qua hệ thống</li>
+                        <li>Hủy hoặc thay đổi dễ dàng trong mục lịch sử</li>
+                    </ul>
+                </div>
+
+                <!-- Form Card -->
+                <div class="reservation-card">
+                    <h3 class="reservation-card__title">🍽️ Đặt bàn của bạn</h3>
+
+                    <div class="form-group">
+                        <label class="form-label">Họ tên khách hàng <span style="color:var(--status-occupied)">*</span></label>
+                        <input class="form-input" type="text" id="res-name" placeholder="Nhập họ tên của bạn" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Số điện thoại <span style="color:var(--status-occupied)">*</span></label>
+                        <input class="form-input" type="tel" id="res-phone" placeholder="0xxx xxx xxx" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Chọn ngày & giờ <span style="color:var(--status-occupied)">*</span></label>
+                        <input class="form-input" type="datetime-local" id="res-date" />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Chọn bàn <span style="color:var(--status-occupied)">*</span></label>
+                        <div class="table-legend">
+                            <div class="table-legend__item">
+                                <div class="legend-dot" style="background:var(--bg-surface);border:1px solid var(--border-subtle)"></div>
+                                Trống
+                            </div>
+                            <div class="table-legend__item">
+                                <div class="legend-dot" style="background:rgba(42,171,184,0.15);border:1px solid var(--accent-primary)"></div>
+                                Đã chọn
+                            </div>
+                            <div class="table-legend__item">
+                                <div class="legend-dot" style="background:rgba(224,92,92,0.15);border:1px solid var(--status-occupied)"></div>
+                                Đã đặt / Đang dùng
+                            </div>
+                        </div>
+                        <div class="table-grid" id="table-grid">
+                            <div class="loading-state" style="grid-column:1/-1;padding:var(--space-8)">
+                                <div class="spinner"></div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- Selected dishes summary -->
+                    <div id="dishes-summary" style="display:none">
+                        <div class="form-group" style="margin-bottom:0">
+                            <label class="form-label">Món đã chọn</label>
+                            <div id="dishes-list" style="display:flex;flex-direction:column;gap:var(--space-2);margin-top:var(--space-2)"></div>
+                        </div>
+                        <div class="divider"></div>
+                    </div>
+
+                    <button class="btn btn-primary" style="width:100%;justify-content:center" id="btn-reserve">
+                        Xác nhận đặt bàn
+                    </button>
+                    <p style="text-align:center;font-size:var(--text-xs);color:var(--text-muted);margin-top:var(--space-3)">
+                        Bạn cần <a href="login.html">đăng nhập</a> để đặt bàn
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="location" style="background: rgba(13,34,64,0.3); border-top: 1px solid var(--border-subtle);">
+        <div class="container">
+            <div style="display: flex; flex-wrap: wrap; gap: var(--space-8); align-items: stretch;">
+
+                <div style="flex: 1; min-width: 320px;">
+                    <div class="reservation-card" style="height: 100%; border-left: 4px solid var(--accent-primary);">
+                        <div class="wave-divider"></div>
+                        <h2 class="reservation-info__title" style="font-size: var(--text-2xl);">Vị Trí <em>Nhà Hàng</em></h2>
+
+                        <div style="margin-top: var(--space-6);">
+                            <p style="color: var(--accent-primary); font-weight: 600; margin-bottom: 4px;">📍 Địa chỉ:</p>
+                            <p style="color: var(--text-muted); font-size: var(--text-sm);">
+                                Hutech khu E, Khu Công nghệ cao, P. Hiệp Phú, TP. Thủ Đức, TP. HCM
+                            </p>
+                        </div>
+
+                        <div style="margin-top: var(--space-4);">
+                            <p style="color: var(--accent-primary); font-weight: 600; margin-bottom: 4px;">📞 Hotline liên hệ:</p>
+                            <p style="color: var(--text-muted); font-size: var(--text-sm);">+84 28 5445 2222</p>
+                        </div>
+
+                        <div style="margin-top: var(--space-4); margin-bottom: var(--space-8);">
+                            <p style="color: var(--accent-primary); font-weight: 600; margin-bottom: 4px;">⏰ Giờ mở cửa:</p>
+                            <p style="color: var(--text-muted); font-size: var(--text-sm);">Thứ 2 - Thứ 7: 07:30 AM - 04:30 PM</p>
+                        </div>
+
+                        <a href="https://www.google.com/maps/dir/?api=1&destination=HUTECH+Đại+học+Công+nghệ+TP.HCM+Thu+Duc+Campus"
+                           target="_blank"
+                           class="btn btn-secondary"
+                           style="width: 100%; justify-content: center; text-decoration: none; display: flex; align-items: center; gap: 8px;">
+                            <span>📍</span> XEM TRONG MAPS
+                        </a>
+                    </div>
+                </div>
+
+                <div style="flex: 1.5; min-width: 320px;">
+                    <div style="height: 450px; border-radius: var(--radius-xl); overflow: hidden; border: 1px solid var(--border-subtle); box-shadow: var(--shadow-lg);">
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3918.520119332307!2d106.7915668758385!3d10.847986957868512!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x317527317e6103df%3A0xc6cf10bb7d719327!2zSFVURU洒落ggLSDEkOG6oWkgaOG7jWMgQ8O0bmcgbmdo4buHIFRQLkhDTSAoVGh1IER1YyBDYW1wdXMp!5e0!3m2!1svi!2s!4v1714144500000!5m2!1svi!2s"
+                                width="100%" height="100%" style="border:0; filter: invert(90%) hue-rotate(180deg) brightness(95%);"
+                                allowfullscreen="" loading="lazy">
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="history" style="display:none">
         <div>
-          <div class="wave-divider"></div>
-          <h2 class="section-title">Lịch sử <em>đặt bàn</em></h2>
+            <div class="wave-divider"></div>
+            <h2 class="section-title">Lịch sử <em>đặt bàn</em></h2>
         </div>
-      </div>
-      <div class="table-wrapper">
-        <table class="data-table" id="history-table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Ngày đặt</th>
-              <th>Bàn số</th>
-              <th>Trạng thái</th>
-              <th>Thao tác</th>
-            </tr>
-          </thead>
-          <tbody id="history-tbody">
-            <tr><td colspan="5" class="loading-state"><div class="spinner"></div></td></tr>
-          </tbody>
-        </table>
-      </div>
+        </div>
+        <div class="table-wrapper">
+            <table class="data-table" id="history-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Ngày đặt</th>
+                        <th>Bàn số</th>
+                        <th>Trạng thái</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody id="history-tbody">
+                    <tr><td colspan="5" class="loading-state"><div class="spinner"></div></td></tr>
+                </tbody>
+            </table>
+        </div>
+        </div>
+    </section>
+
+    <!-- Cart FAB -->
+    <button class="cart-fab" id="cart-fab" title="Giỏ món ăn">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <path d="M16 10a4 4 0 01-8 0" />
+        </svg>
+        <span class="cart-fab__badge" id="cart-count">0</span>
+    </button>
+
+    <!-- Cart Drawer Overlay -->
+    <div class="cart-drawer__overlay" id="cart-overlay"></div>
+
+    <!-- Cart Drawer -->
+    <div class="cart-drawer" id="cart-drawer">
+        <div class="cart-drawer__header">
+            <h3 class="cart-drawer__title">Giỏ món ăn</h3>
+            <button class="modal__close" id="cart-close">✕</button>
+        </div>
+        <div class="cart-drawer__body" id="cart-body">
+            <div class="empty-state">
+                <div class="empty-state__icon">🛒</div>
+                <p>Chưa có món nào</p>
+                <p style="font-size:var(--text-xs)">Chọn món từ thực đơn bên trên</p>
+            </div>
+        </div>
+        <div class="cart-drawer__footer">
+            <div class="cart-total">
+                <span class="cart-total__label">Tổng cộng</span>
+                <span class="cart-total__amount" id="cart-total">0 ₫</span>
+            </div>
+            <button class="btn btn-primary" style="width:100%;justify-content:center" id="btn-to-reserve">
+                Đặt bàn với món này ↓
+            </button>
+        </div>
     </div>
-  </section>
 
-  <!-- Cart FAB -->
-  <button class="cart-fab" id="cart-fab" title="Giỏ món ăn">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
-      <line x1="3" y1="6" x2="21" y2="6"/>
-      <path d="M16 10a4 4 0 01-8 0"/>
-    </svg>
-    <span class="cart-fab__badge" id="cart-count">0</span>
-  </button>
+    <div class="toast-container"></div>
 
-  <!-- Cart Drawer Overlay -->
-  <div class="cart-drawer__overlay" id="cart-overlay"></div>
+    <script type="module">
+        import { Auth } from './js/services/authService.js';
+        import api, { MonAnApi, BanAnApi, DatBanApi, Toast, formatPrice, formatDate, getImageUrl } from './js/apiClient.js';
+        import MonAnComponent from './components/MonAnComponent.js';
 
-  <!-- Cart Drawer -->
-  <div class="cart-drawer" id="cart-drawer">
-    <div class="cart-drawer__header">
-      <h3 class="cart-drawer__title">Giỏ món ăn</h3>
-      <button class="modal__close" id="cart-close">✕</button>
-    </div>
-    <div class="cart-drawer__body" id="cart-body">
-      <div class="empty-state">
-        <div class="empty-state__icon">🛒</div>
-        <p>Chưa có món nào</p>
-        <p style="font-size:var(--text-xs)">Chọn món từ thực đơn bên trên</p>
-      </div>
-    </div>
-    <div class="cart-drawer__footer">
-      <div class="cart-total">
-        <span class="cart-total__label">Tổng cộng</span>
-        <span class="cart-total__amount" id="cart-total">0 ₫</span>
-      </div>
-      <button class="btn btn-primary" style="width:100%;justify-content:center" id="btn-to-reserve">
-        Đặt bàn với món này ↓
-      </button>
-    </div>
-  </div>
+        // ── State ──────────────────────────────────────────────
+        const cart = new Map(); // monAnId → { item, qty }
+        let selectedTableId = null;
+        let tables = [];
 
-  <div class="toast-container"></div>
-
-  <script type="module">
-    import { Auth } from './js/services/authService.js';
-    import api, { MonAnApi, BanAnApi, DatBanApi, Toast, formatPrice, formatDate, getImageUrl } from './js/apiClient.js';
-    import MonAnComponent from './components/MonAnComponent.js';
-
-    // ── State ──────────────────────────────────────────────
-    const cart = new Map(); // monAnId → { item, qty }
-    let selectedTableId = null;
-    let tables = [];
-
-    // ── Navbar ─────────────────────────────────────────────
-    function renderNavbar() {
-      const el = document.getElementById('navbar-actions');
-      if (Auth.isLoggedIn()) {
-        const initial = Auth.getUsername().charAt(0).toUpperCase();
-        el.innerHTML = `
-          <div class="user-chip">
-            <div class="user-chip__avatar">${initial}</div>
-            ${Auth.getUsername()}
-          </div>
-          ${Auth.isAdmin() ? `<a href="admin.html" class="btn btn-ghost btn-sm">Admin ↗</a>` : ''}
-          <button class="btn btn-ghost btn-sm" id="btn-logout">Đăng xuất</button>
-        `;
-        document.getElementById('nav-history').style.display = '';
-        document.getElementById('history').style.display = '';
-        loadHistory();
-        document.getElementById('btn-logout').addEventListener('click', () => {
-          Auth.clear();
-          window.location.reload();
-        });
-      } else {
-        el.innerHTML = `<a href="login.html" class="btn btn-primary btn-sm">Đăng nhập</a>`;
-      }
-    }
-
-    // ── Menu ──────────────────────────────────────────────
-    const menuComp = new MonAnComponent('#menu-root', { admin: false });
-    await menuComp.init();
-
-    // Listen for order events from MonAnComponent
-    document.getElementById('menu-root').addEventListener('mon-an:order', (e) => {
-      addToCart(e.detail.item);
-    });
-
-    // ── Cart ──────────────────────────────────────────────
-    function addToCart(item) {
-      if (cart.has(item.id)) {
-        cart.get(item.id).qty++;
-      } else {
-        cart.set(item.id, { item, qty: 1 });
-      }
-      updateCartUI();
-      Toast.success(`Đã thêm "${item.tenMonAn}" vào giỏ`);
-      openCart();
-    }
-
-    function updateCartUI() {
-      const total = [...cart.values()].reduce((s, { item, qty }) => s + item.gia * qty, 0);
-      const count = [...cart.values()].reduce((s, { qty }) => s + qty, 0);
-
-      const badge = document.getElementById('cart-count');
-      badge.textContent = count;
-      badge.style.display = count > 0 ? 'flex' : 'none';
-
-      document.getElementById('cart-total').textContent = formatPrice(total);
-
-      const body = document.getElementById('cart-body');
-      if (cart.size === 0) {
-        body.innerHTML = `
-          <div class="empty-state">
-            <div class="empty-state__icon">🛒</div>
-            <p>Chưa có món nào</p>
-          </div>`;
-        return;
-      }
-
-      body.innerHTML = [...cart.values()].map(({ item, qty }) => `
-        <div class="cart-item" data-id="${item.id}">
-          <div class="cart-item__img" style="background:var(--bg-surface);border-radius:var(--radius-md);overflow:hidden">
-            ${item.hinhAnh
-              ? `<img src="${getImageUrl(item.hinhAnh)}" style="width:100%;height:100%;object-fit:cover" />`
-              : `<div style="width:56px;height:56px;display:flex;align-items:center;justify-content:center;font-size:1.5rem">🍜</div>`
+        // ── Navbar ─────────────────────────────────────────────
+        function renderNavbar() {
+            const el = document.getElementById('navbar-actions');
+            if (Auth.isLoggedIn()) {
+                const initial = Auth.getUsername().charAt(0).toUpperCase();
+                el.innerHTML = `
+              <div class="user-chip">
+                <div class="user-chip__avatar">${initial}</div>
+                ${Auth.getUsername()}
+              </div>
+              ${Auth.isAdmin() ? `<a href="admin.html" class="btn btn-ghost btn-sm">Admin ↗</a>` : ''}
+              <button class="btn btn-ghost btn-sm" id="btn-logout">Đăng xuất</button>
+            `;
+                document.getElementById('nav-history').style.display = '';
+                document.getElementById('history').style.display = '';
+                loadHistory();
+                document.getElementById('btn-logout').addEventListener('click', () => {
+                    Auth.clear();
+                    window.location.reload();
+                });
+            } else {
+                el.innerHTML = `<a href="login.html" class="btn btn-primary btn-sm">Đăng nhập</a>`;
             }
-          </div>
-          <div class="cart-item__info">
-            <div class="cart-item__name">${item.tenMonAn}</div>
-            <div class="cart-item__price">${formatPrice(item.gia)}</div>
-          </div>
-          <div class="cart-qty">
-            <button class="cart-qty__btn" data-action="dec" data-id="${item.id}">−</button>
-            <span class="cart-qty__num">${qty}</span>
-            <button class="cart-qty__btn" data-action="inc" data-id="${item.id}">+</button>
-          </div>
-        </div>
-      `).join('');
-
-      body.querySelectorAll('[data-action]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const id  = parseInt(btn.dataset.id);
-          const act = btn.dataset.action;
-          const entry = cart.get(id);
-          if (!entry) return;
-          if (act === 'inc') entry.qty++;
-          else if (act === 'dec') {
-            entry.qty--;
-            if (entry.qty <= 0) cart.delete(id);
-          }
-          updateCartUI();
-        });
-      });
-
-      // Update dishes summary in reservation form
-      updateDishesSummary();
-    }
-
-    function updateDishesSummary() {
-      const summary = document.getElementById('dishes-summary');
-      const list    = document.getElementById('dishes-list');
-      if (cart.size === 0) { summary.style.display = 'none'; return; }
-
-      summary.style.display = '';
-      list.innerHTML = [...cart.values()].map(({ item, qty }) => `
-        <div style="display:flex;justify-content:space-between;align-items:center;font-size:var(--text-sm);color:var(--text-secondary)">
-          <span>${item.tenMonAn} × ${qty}</span>
-          <span style="color:var(--accent-primary)">${formatPrice(item.gia * qty)}</span>
-        </div>
-      `).join('');
-    }
-
-    // Cart drawer toggle
-    const drawer  = document.getElementById('cart-drawer');
-    const overlay = document.getElementById('cart-overlay');
-    const openCart  = () => { drawer.classList.add('open'); overlay.classList.add('show'); };
-    const closeCart = () => { drawer.classList.remove('open'); overlay.classList.remove('show'); };
-
-    document.getElementById('cart-fab').addEventListener('click', openCart);
-    document.getElementById('cart-close').addEventListener('click', closeCart);
-    overlay.addEventListener('click', closeCart);
-
-    document.getElementById('btn-to-reserve').addEventListener('click', () => {
-      closeCart();
-      document.getElementById('reservation').scrollIntoView({ behavior: 'smooth' });
-    });
-
-    // ── Tables ────────────────────────────────────────────
-    async function loadTables() {
-      try {
-        tables = await BanAnApi.getAll();
-        document.getElementById('stat-tables').textContent = tables.length;
-        renderTableGrid();
-      } catch (err) {
-        document.getElementById('table-grid').innerHTML =
-          `<p style="color:var(--text-muted);font-size:var(--text-sm);grid-column:1/-1">Không thể tải danh sách bàn</p>`;
-      }
-    }
-
-    function renderTableGrid() {
-      const grid = document.getElementById('table-grid');
-      const statusMap = {
-        'available': 'Trống', 'occupied': 'Đang dùng',
-        'reserved': 'Đã đặt', 'Available': 'Trống',
-        'Occupied': 'Đang dùng', 'Reserved': 'Đã đặt'
-      };
-      const occupiedStatus = ['occupied','reserved','Occupied','Reserved'];
-
-      grid.innerHTML = tables.map(t => {
-        const isOccupied = occupiedStatus.includes(t.trangThai);
-        const isSelected = t.id === selectedTableId;
-        return `
-          <div class="table-slot ${isOccupied ? 'occupied' : ''} ${isSelected ? 'selected' : ''}"
-               data-id="${t.id}" title="${t.soChoNgoi} chỗ ngồi">
-            <span class="table-slot__num">${t.soBan}</span>
-            <span style="font-size:10px">${t.soChoNgoi}👤</span>
-          </div>
-        `;
-      }).join('');
-
-      grid.querySelectorAll('.table-slot:not(.occupied)').forEach(slot => {
-        slot.addEventListener('click', () => {
-          selectedTableId = parseInt(slot.dataset.id);
-          renderTableGrid();
-        });
-      });
-    }
-
-    // ── Reservation Submit ────────────────────────────────
-    document.getElementById('btn-reserve').addEventListener('click', async () => {
-      if (!Auth.isLoggedIn()) {
-        Toast.info('Vui lòng đăng nhập để đặt bàn');
-        setTimeout(() => window.location.href = 'login.html', 1200);
-        return;
-      }
-
-      
-      const tenKhachHang = document.getElementById('res-name').value.trim();
-      const soDienThoai  = document.getElementById('res-phone').value.trim();
-      const ngayDat       = document.getElementById('res-date').value;
-      if (!tenKhachHang) { Toast.error('Vui lòng nhập họ tên'); return; }
-      if (!soDienThoai)  { Toast.error('Vui lòng nhập số điện thoại'); return; }
-      if (!ngayDat)       { Toast.error('Vui lòng chọn ngày & giờ'); return; }
-      if (!selectedTableId) { Toast.error('Vui lòng chọn bàn'); return; }
-
-      const cartItems = [...cart.values()].map(({ item, qty }) => ({
-        id:  item.id,
-        qty: qty,
-      }));
-
-      const btn = document.getElementById('btn-reserve');
-      btn.disabled = true;
-      btn.textContent = 'Đang đặt bàn…';
-
-      try {
-        await DatBanApi.create({
-          banAnId:        selectedTableId,
-          tenKhachHang:   tenKhachHang,
-          soDienThoai:    soDienThoai,
-          gioDenDuyKien:  new Date(ngayDat).toISOString(),
-          cartItems:      cartItems,
-        });
-
-        Toast.success('Đặt bàn thành công!');
-        cart.clear();
-        selectedTableId = null;
-        updateCartUI();
-        document.getElementById('res-date').value  = '';
-        document.getElementById('res-name').value  = '';
-        document.getElementById('res-phone').value = '';
-        await loadTables();
-        await loadHistory();
-        document.getElementById('history').scrollIntoView({ behavior: 'smooth' });
-      } catch (err) {
-        Toast.error(err.message || 'Đặt bàn thất bại, thử lại sau');
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'Xác nhận đặt bàn';
-      }
-    });
-
-    // ── History ───────────────────────────────────────────
-    async function loadHistory() {
-      if (!Auth.isLoggedIn()) return;
-      const tbody = document.getElementById('history-tbody');
-      tbody.innerHTML = `<tr><td colspan="5"><div class="loading-state" style="padding:var(--space-8)"><div class="spinner"></div></div></td></tr>`;
-      try {
-        const data = await DatBanApi.getMyHistory();
-        if (!data.length) {
-          tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state" style="padding:var(--space-8)"><div class="empty-state__icon">📋</div><p>Chưa có đơn đặt bàn nào</p></div></td></tr>`;
-          return;
         }
 
-        const badgeMap = {
-          'pending':'badge-pending','Pending':'badge-pending',
-          'confirmed':'badge-confirmed','Confirmed':'badge-confirmed',
-          'cancelled':'badge-cancelled','Cancelled':'badge-cancelled',
-          'paid':'badge-confirmed','Paid':'badge-confirmed',
-        };
-        const labelMap = {
-          'pending':'Chờ xác nhận','Pending':'Chờ xác nhận',
-          'confirmed':'Đã xác nhận','Confirmed':'Đã xác nhận',
-          'cancelled':'Đã hủy','Cancelled':'Đã hủy',
-          'paid':'Đã thanh toán','Paid':'Đã thanh toán',
-        };
+        // ── Menu ──────────────────────────────────────────────
+        const menuComp = new MonAnComponent('#menu-root', { admin: false });
+        await menuComp.init();
 
-        tbody.innerHTML = data.map(d => `
-          <tr>
-            <td style="font-family:var(--font-mono);font-size:var(--text-xs);color:var(--text-muted)">#${d.id}</td>
-            <td>${formatDate(d.ngayDat)}</td>
-            <td>Bàn ${d.banAnId}</td>
-            <td><span class="badge ${badgeMap[d.trangThai] || 'badge-pending'}">${labelMap[d.trangThai] || d.trangThai}</span></td>
-            <td>
-              ${(d.trangThai === 'pending' || d.trangThai === 'Pending') ? `
-                <button class="btn btn-danger btn-sm" data-cancel="${d.id}">Hủy</button>
-              ` : '—'}
-            </td>
-          </tr>
-        `).join('');
-
-        tbody.querySelectorAll('[data-cancel]').forEach(btn => {
-          btn.addEventListener('click', async () => {
-            if (!confirm('Xác nhận hủy đơn đặt bàn này?')) return;
-            btn.disabled = true; btn.textContent = '…';
-            try {
-              await DatBanApi.cancel(btn.dataset.cancel);
-              Toast.success('Đã hủy đặt bàn');
-              await loadHistory();
-              await loadTables();
-            } catch (err) {
-              Toast.error(err.message || 'Không thể hủy đơn');
-              btn.disabled = false; btn.textContent = 'Hủy';
-            }
-          });
+        // Listen for order events from MonAnComponent
+        document.getElementById('menu-root').addEventListener('mon-an:order', (e) => {
+            addToCart(e.detail.item);
         });
-      } catch (err) {
-        tbody.innerHTML = `<tr><td colspan="5" style="color:var(--status-occupied);padding:var(--space-6)">${err.message}</td></tr>`;
-      }
-    }
 
-    // ── Init ──────────────────────────────────────────────
-    renderNavbar();
-    await loadTables();
+        // ── Cart ──────────────────────────────────────────────
+        function addToCart(item) {
+            if (cart.has(item.id)) {
+                cart.get(item.id).qty++;
+            } else {
+                cart.set(item.id, { item, qty: 1 });
+            }
+            updateCartUI();
+            Toast.success(`Đã thêm "${item.tenMonAn}" vào giỏ`);
+            openCart();
+        }
 
-    // Set min datetime to now
-    const now = new Date();
-    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-    document.getElementById('res-date').min = now.toISOString().slice(0,16);
-  </script>
+        function updateCartUI() {
+            const total = [...cart.values()].reduce((s, { item, qty }) => s + item.gia * qty, 0);
+            const count = [...cart.values()].reduce((s, { qty }) => s + qty, 0);
+
+            const badge = document.getElementById('cart-count');
+            badge.textContent = count;
+            badge.style.display = count > 0 ? 'flex' : 'none';
+
+            document.getElementById('cart-total').textContent = formatPrice(total);
+
+            const body = document.getElementById('cart-body');
+            if (cart.size === 0) {
+                body.innerHTML = `
+              <div class="empty-state">
+                <div class="empty-state__icon">🛒</div>
+                <p>Chưa có món nào</p>
+              </div>`;
+                return;
+            }
+
+            body.innerHTML = [...cart.values()].map(({ item, qty }) => `
+            <div class="cart-item" data-id="${item.id}">
+              <div class="cart-item__img" style="background:var(--bg-surface);border-radius:var(--radius-md);overflow:hidden">
+                ${item.hinhAnh
+                    ? `<img src="${getImageUrl(item.hinhAnh)}" style="width:100%;height:100%;object-fit:cover" />`
+                    : `<div style="width:56px;height:56px;display:flex;align-items:center;justify-content:center;font-size:1.5rem">🍜</div>`
+                }
+              </div>
+              <div class="cart-item__info">
+                <div class="cart-item__name">${item.tenMonAn}</div>
+                <div class="cart-item__price">${formatPrice(item.gia)}</div>
+              </div>
+              <div class="cart-qty">
+                <button class="cart-qty__btn" data-action="dec" data-id="${item.id}">−</button>
+                <span class="cart-qty__num">${qty}</span>
+                <button class="cart-qty__btn" data-action="inc" data-id="${item.id}">+</button>
+              </div>
+            </div>
+          `).join('');
+
+            body.querySelectorAll('[data-action]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = parseInt(btn.dataset.id);
+                    const act = btn.dataset.action;
+                    const entry = cart.get(id);
+                    if (!entry) return;
+                    if (act === 'inc') entry.qty++;
+                    else if (act === 'dec') {
+                        entry.qty--;
+                        if (entry.qty <= 0) cart.delete(id);
+                    }
+                    updateCartUI();
+                });
+            });
+
+            // Update dishes summary in reservation form
+            updateDishesSummary();
+        }
+
+        function updateDishesSummary() {
+            const summary = document.getElementById('dishes-summary');
+            const list = document.getElementById('dishes-list');
+            if (cart.size === 0) { summary.style.display = 'none'; return; }
+
+            summary.style.display = '';
+            list.innerHTML = [...cart.values()].map(({ item, qty }) => `
+            <div style="display:flex;justify-content:space-between;align-items:center;font-size:var(--text-sm);color:var(--text-secondary)">
+              <span>${item.tenMonAn} × ${qty}</span>
+              <span style="color:var(--accent-primary)">${formatPrice(item.gia * qty)}</span>
+            </div>
+          `).join('');
+        }
+
+        // Cart drawer toggle
+        const drawer = document.getElementById('cart-drawer');
+        const overlay = document.getElementById('cart-overlay');
+        const openCart = () => { drawer.classList.add('open'); overlay.classList.add('show'); };
+        const closeCart = () => { drawer.classList.remove('open'); overlay.classList.remove('show'); };
+
+        document.getElementById('cart-fab').addEventListener('click', openCart);
+        document.getElementById('cart-close').addEventListener('click', closeCart);
+        overlay.addEventListener('click', closeCart);
+
+        document.getElementById('btn-to-reserve').addEventListener('click', () => {
+            closeCart();
+            document.getElementById('reservation').scrollIntoView({ behavior: 'smooth' });
+        });
+
+        // ── Tables ────────────────────────────────────────────
+        async function loadTables() {
+            try {
+                tables = await BanAnApi.getAll();
+                document.getElementById('stat-tables').textContent = tables.length;
+                renderTableGrid();
+            } catch (err) {
+                document.getElementById('table-grid').innerHTML =
+                    `<p style="color:var(--text-muted);font-size:var(--text-sm);grid-column:1/-1">Không thể tải danh sách bàn</p>`;
+            }
+        }
+
+        function renderTableGrid() {
+            const grid = document.getElementById('table-grid');
+
+            // Chuẩn hóa kiểm tra trạng thái: 1 hoặc 'Occupied' là Đang dùng, 2 hoặc 'Reserved' là Đã đặt
+            const occupiedValues = [1, 2, 'occupied', 'reserved', 'Occupied', 'Reserved'];
+
+            grid.innerHTML = tables.map(t => {
+                // Nếu trạng thái nằm trong danh sách occupiedValues thì là bàn bận
+                const isOccupied = occupiedValues.includes(t.trangThai);
+                const isSelected = t.id === selectedTableId;
+
+                return `
+          <div class="table-slot ${isOccupied ? 'occupied' : ''} ${isSelected ? 'selected' : ''}"
+               data-id="${t.id}"
+               data-occupied="${isOccupied}"
+               title="${isOccupied ? 'Bàn này hiện không trống' : `${t.soChoNgoi} chỗ ngồi`}">
+            <span class="table-slot__num">${t.soBan}</span>
+            <span style="font-size:10px">${t.soChoNgoi}👤</span>
+            ${isOccupied ? '<div class="lock-icon">🔒</div>' : ''}
+          </div>
+        `;
+            }).join('');
+
+            // Chỉ gán sự kiện click cho những bàn KHÔNG bị occupied
+            grid.querySelectorAll('.table-slot').forEach(slot => {
+                if (slot.dataset.occupied === 'false') {
+                    slot.addEventListener('click', () => {
+                        selectedTableId = parseInt(slot.dataset.id);
+                        renderTableGrid();
+                    });
+                }
+            });
+        }
+
+        // ── Reservation Submit ────────────────────────────────
+        document.getElementById('btn-reserve').addEventListener('click', async () => {
+            if (!Auth.isLoggedIn()) {
+                Toast.info('Vui lòng đăng nhập để đặt bàn');
+                setTimeout(() => window.location.href = 'login.html', 1200);
+                return;
+            }
+
+
+            const tenKhachHang = document.getElementById('res-name').value.trim();
+            const soDienThoai = document.getElementById('res-phone').value.trim();
+            const ngayDat = document.getElementById('res-date').value;
+            if (!tenKhachHang) { Toast.error('Vui lòng nhập họ tên'); return; }
+            if (!soDienThoai) { Toast.error('Vui lòng nhập số điện thoại'); return; }
+            if (!ngayDat) { Toast.error('Vui lòng chọn ngày & giờ'); return; }
+            if (!selectedTableId) { Toast.error('Vui lòng chọn bàn'); return; }
+
+            const cartItems = [...cart.values()].map(({ item, qty }) => ({
+                id: item.id,
+                qty: qty,
+            }));
+
+            const btn = document.getElementById('btn-reserve');
+            btn.disabled = true;
+            btn.textContent = 'Đang đặt bàn…';
+
+            try {
+                await DatBanApi.create({
+                    banAnId: selectedTableId,
+                    tenKhachHang: tenKhachHang,
+                    soDienThoai: soDienThoai,
+                    gioDenDuyKien: new Date(ngayDat).toISOString(),
+                    cartItems: cartItems,
+                });
+
+                Toast.success('Đặt bàn thành công!');
+                cart.clear();
+                selectedTableId = null;
+                updateCartUI();
+                document.getElementById('res-date').value = '';
+                document.getElementById('res-name').value = '';
+                document.getElementById('res-phone').value = '';
+                await loadTables();
+                await loadHistory();
+                document.getElementById('history').scrollIntoView({ behavior: 'smooth' });
+            } catch (err) {
+                Toast.error(err.message || 'Đặt bàn thất bại, thử lại sau');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Xác nhận đặt bàn';
+            }
+        });
+
+        // ── History ───────────────────────────────────────────
+        async function loadHistory() {
+            if (!Auth.isLoggedIn()) return;
+            const tbody = document.getElementById('history-tbody');
+            tbody.innerHTML = `<tr><td colspan="5"><div class="loading-state" style="padding:var(--space-8)"><div class="spinner"></div></div></td></tr>`;
+            try {
+                const data = await DatBanApi.getMyHistory();
+                if (!data.length) {
+                    tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state" style="padding:var(--space-8)"><div class="empty-state__icon">📋</div><p>Chưa có đơn đặt bàn nào</p></div></td></tr>`;
+                    return;
+                }
+
+                const badgeMap = {
+                    'pending': 'badge-pending', 'Pending': 'badge-pending',
+                    'confirmed': 'badge-confirmed', 'Confirmed': 'badge-confirmed',
+                    'cancelled': 'badge-cancelled', 'Cancelled': 'badge-cancelled',
+                    'paid': 'badge-confirmed', 'Paid': 'badge-confirmed',
+                };
+                const labelMap = {
+                    'pending': 'Chờ xác nhận', 'Pending': 'Chờ xác nhận',
+                    'confirmed': 'Đã xác nhận', 'Confirmed': 'Đã xác nhận',
+                    'cancelled': 'Đã hủy', 'Cancelled': 'Đã hủy',
+                    'paid': 'Đã thanh toán', 'Paid': 'Đã thanh toán',
+                };
+
+                tbody.innerHTML = data.map(d => `
+              <tr>
+                <td style="font-family:var(--font-mono);font-size:var(--text-xs);color:var(--text-muted)">#${d.id}</td>
+                <td>${formatDate(d.ngayDat)}</td>
+                <td>Bàn ${d.banAnId}</td>
+                <td><span class="badge ${badgeMap[d.trangThai] || 'badge-pending'}">${labelMap[d.trangThai] || d.trangThai}</span></td>
+                <td>
+                  ${(d.trangThai === 'pending' || d.trangThai === 'Pending') ? `
+                    <button class="btn btn-danger btn-sm" data-cancel="${d.id}">Hủy</button>
+                  ` : '—'}
+                </td>
+              </tr>
+            `).join('');
+
+                tbody.querySelectorAll('[data-cancel]').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        if (!confirm('Xác nhận hủy đơn đặt bàn này?')) return;
+                        btn.disabled = true; btn.textContent = '…';
+                        try {
+                            await DatBanApi.cancel(btn.dataset.cancel);
+                            Toast.success('Đã hủy đặt bàn');
+                            await loadHistory();
+                            await loadTables();
+                        } catch (err) {
+                            Toast.error(err.message || 'Không thể hủy đơn');
+                            btn.disabled = false; btn.textContent = 'Hủy';
+                        }
+                    });
+                });
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="5" style="color:var(--status-occupied);padding:var(--space-6)">${err.message}</td></tr>`;
+            }
+        }
+
+        // ── Init ──────────────────────────────────────────────
+        renderNavbar();
+        await loadTables();
+
+        // Set min datetime to now
+        const now = new Date();
+        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+        document.getElementById('res-date').min = now.toISOString().slice(0, 16);
+    </script>
 </body>
 </html>

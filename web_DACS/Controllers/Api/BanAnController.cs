@@ -72,6 +72,7 @@ namespace web_DACS.Controllers.Api
             if (!result.Status) return result;
             return result;
         }
+
     }
 
     public class CreateBanAnRequest
