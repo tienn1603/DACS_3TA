@@ -173,24 +173,37 @@ export const Toast = {
         return this._container;
     },
 
-    show(message, type = 'info', duration = 3500) {
+    show(message, type = 'info', duration = 4000) {
         const icons = { success: '✓', error: '✕', info: 'ℹ' };
         const container = this._getContainer();
+
         const toast = document.createElement('div');
         toast.className = `toast toast-${type}`;
+
         toast.innerHTML = `
-      <span style="font-size:1.1rem; flex-shrink:0">${icons[type]}</span>
-      <span>${message}</span>`;
-        container.appendChild(toast);
+            <span style="font-size:1.1rem; font-weight:bold; flex-shrink:0">${icons[type]}</span>
+            <span style="flex:1; line-height: 1.4">${message}</span>
+        `;
+
+        container.prepend(toast);
+        void toast.offsetWidth; 
+        toast.classList.add('active');
+
+        // 2. ÉP BUỘC trình duyệt phải render Toast trước khi chạy code tiếp theo
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                toast.classList.add('active');
+            });
+        });
+
+        // 3. Tự động đóng
         setTimeout(() => {
-            toast.style.animation = 'slideIn 0.3s ease reverse';
-            toast.addEventListener('animationend', () => toast.remove());
+            toast.classList.remove('active');
+            toast.addEventListener('transitionend', () => toast.remove(), { once: true });
         }, duration);
     },
 
     success: (msg) => Toast.show(msg, 'success'),
     error: (msg) => Toast.show(msg, 'error'),
     info: (msg) => Toast.show(msg, 'info'),
-};
-
-export default { Auth, Account: AccountApi, MonAn: MonAnApi, BanAn: BanAnApi, DatBan: DatBanApi, Toast, getImageUrl, formatPrice, formatDate };
+}; export default { Auth, Account: AccountApi, MonAn: MonAnApi, BanAn: BanAnApi, DatBan: DatBanApi, Toast, getImageUrl, formatPrice, formatDate };
