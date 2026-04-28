@@ -544,38 +544,57 @@ table.data-table {
   border-color: rgba(224, 92, 92, 0.3);
 }
 
-/* ── Toast Notifications ─────────────────────────────────── */
+/* ── Toast Notifications ── */
 .toast-container {
-  position: fixed;
-  bottom: var(--space-6);
-  right: var(--space-6);
-  z-index: 300;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 10000; /* Tăng lên hẳn 10000 để đè lên giỏ hàng */
+    display: flex;
+    flex-direction: column-reverse; /* Thông báo mới nhất nằm dưới cùng để dễ nhìn */
+    gap: 0.75rem;
+}
+
+.toast-container {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 100000; /* Số cực lớn để không bị gì đè lên */
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none; /* Container không cản click */
 }
 
 .toast {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  padding: var(--space-4) var(--space-5);
-  color: var(--text-primary);
-  font-size: var(--text-sm);
-  min-width: 280px;
-  max-width: 380px;
-  box-shadow: var(--shadow-lg);
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  animation: slideIn 0.3s ease;
+    background: #1e293b;
+    border-radius: 8px;
+    padding: 12px 20px;
+    color: white;
+    min-width: 300px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    pointer-events: auto; /* Chỉ toast mới nhận click */
+    /* Hiệu ứng trượt từ phải sang */
+    transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    opacity: 0;
+    transform: translateX(100px);
 }
 
-.toast-success { border-left: 3px solid var(--status-available); }
-.toast-error   { border-left: 3px solid var(--status-occupied); }
-.toast-info    { border-left: 3px solid var(--accent-primary); }
+    .toast.active {
+        opacity: 1;
+        transform: translateX(0);
+    }
 
-/* ── Section Header ──────────────────────────────────────── */
+.toast-success {
+    border-left: 5px solid #10b981;
+}
+
+.toast-error {
+    border-left: 5px solid #ef4444;
+}/* ── Section Header ──────────────────────────────────────── */
 .section-header {
   display: flex;
   align-items: flex-end;
@@ -687,8 +706,15 @@ table.data-table {
 }
 
 @keyframes slideIn {
-  from { opacity: 0; transform: translateX(20px); }
-  to   { opacity: 1; transform: translateX(0); }
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
 }
 
 @keyframes shimmer {

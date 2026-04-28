@@ -119,17 +119,21 @@ export default class MonAnComponent {
   }
 
   // ── Loading state ────────────────────────────────────────────
-  _setLoading(val) {
-    this.loading = val;
-    if (!this._listEl) return;
-    if (val) {
-      this._listEl.innerHTML = `
-        <div class="loading-state" style="grid-column:1/-1">
-          <div class="spinner"></div>
-          <span>Đang tải thực đơn…</span>
-        </div>`;
+    _setLoading(val) {
+        this.loading = val;
+        if (!this._listEl) return;
+
+        if (val && this._listEl.children.length === 0) {
+            this._listEl.innerHTML = `
+            <div class="loading-state" style="grid-column:1/-1">
+                <div class="spinner"></div>
+                <span>Đang tải thực đơn…</span>
+            </div>`;
+        } else if (!val) {
+            const spinner = this._listEl.querySelector('.loading-state');
+            if (spinner) spinner.remove();
+        }
     }
-  }
 
   _renderError(msg) {
     this._listEl.innerHTML = `
@@ -309,80 +313,100 @@ export default class MonAnComponent {
     form.addEventListener('submit', e => this._handleFormSubmit(e, isEdit, close));
   }
 
-  async _handleFormSubmit(e, isEdit, closeFn) {
-    e.preventDefault();
-    const form   = e.target;
-    const submit = form.querySelector('#modal-submit');
-    const label  = form.querySelector('#submit-label');
+    async _handleFormSubmit(e, isEdit, closeFn) {
+        e.preventDefault();
+        const form = e.target;
+        const submit = form.querySelector('#modal-submit');
+        const label = form.querySelector('#submit-label');
 
-    // Validate
-    const tenMonAn = form.tenMonAn.value.trim();
-    const gia      = parseFloat(form.gia.value);
-    const loai     = form.loai.value.trim();
-    let valid      = true;
+        // 1. Validate dữ liệu
+        const tenMonAn = form.tenMonAn.value.trim();
+        const gia = parseFloat(form.gia.value);
+        const loai = form.loai.value.trim();
+        let valid = true;
 
-    document.querySelectorAll('.form-error').forEach(el => el.textContent = '');
+        document.querySelectorAll('.form-error').forEach(el => el.textContent = '');
 
-    if (!tenMonAn) {
-      document.querySelector('#err-tenMonAn').textContent = 'Vui lòng nhập tên món ăn';
-      valid = false;
+        if (!tenMonAn) {
+            document.querySelector('#err-tenMonAn').textContent = 'Vui lòng nhập tên món ăn';
+            valid = false;
+        }
+        if (!gia || gia <= 0) {
+            document.querySelector('#err-gia').textContent = 'Vui lòng nhập giá hợp lệ';
+            valid = false;
+        }
+        if (!loai) {
+            document.querySelector('#err-loai').textContent = 'Vui lòng chọn loại món ăn';
+            valid = false;
+        }
+        if (!valid) return;
+
+        // 2. Build FormData
+        const fd = new FormData();
+        fd.append('TenMon', tenMonAn);
+        fd.append('MoTa', form.moTa.value.trim());
+        fd.append('Gia', gia);
+        fd.append('Loai', loai);
+
+        const existingItem = isEdit ? this.items.find(m => m.id === this._editingId) : null;
+        if (isEdit && !form.hinhAnh.files[0]) {
+            fd.append('HinhAnh', existingItem?.hinhAnh ?? '');
+        }
+        if (form.hinhAnh.files[0]) {
+            fd.append('HinhAnhFile', form.hinhAnh.files[0]);
+        }
+
+        // 3. Thực thi API
+        submit.disabled = true;
+        label.textContent = 'Đang lưu…';
+
+        try {
+            if (isEdit) {
+                await MonAnApi.update(this._editingId, fd);
+                closeFn(); // Đóng modal trước
+                // Delay 100ms để trình duyệt rảnh tay vẽ Toast
+                setTimeout(() => Toast.success('Cập nhật món ăn thành công!'), 100);
+            } else {
+                await MonAnApi.create(fd);
+                closeFn();
+                setTimeout(() => Toast.success('Thêm món ăn thành công!'), 100);
+            }
+
+            // Quan trọng: Đợi Toast hiện lên vững vàng rồi mới load lại danh sách nặng
+            setTimeout(() => {
+                this._loadItems();
+            }, 600);
+
+        } catch (err) {
+            Toast.error(err.message || 'Có lỗi xảy ra, thử lại sau!');
+            submit.disabled = false;
+            label.textContent = isEdit ? 'Lưu thay đổi' : 'Thêm món';
+        }
     }
-    if (!gia || gia <= 0) {
-      document.querySelector('#err-gia').textContent = 'Vui lòng nhập giá hợp lệ';
-      valid = false;
-    }
-    if (!loai) {
-      document.querySelector('#err-loai').textContent = 'Vui lòng chọn loại món ăn';
-      valid = false;
-    }
-    if (!valid) return;
 
-    // Build FormData (backend dùng [FromForm] — field name phải khớp CreateMonAnRequest)
-    const fd = new FormData();
-    fd.append('TenMon', tenMonAn);
-    fd.append('MoTa',   form.moTa.value.trim());
-    fd.append('Gia',    gia);
-    fd.append('Loai',   loai);
+    // ── Order Event (User mode) ───────────────────────────────────
+    _dispatchOrder(item) {
+        // 1. Hiện thông báo phản hồi NGAY LẬP TỨC
+        Toast.success(`Đã thêm "${item.tenMonAn}" vào giỏ`);
 
-    // Khi edit: gửi ảnh cũ để giữ nguyên, chỉ thay khi có file mới
-    const existingItem = isEdit ? this.items.find(m => m.id === this._editingId) : null;
-    if (isEdit && !form.hinhAnh.files[0]) {
-      fd.append('HinhAnh', existingItem?.hinhAnh ?? '');
+        // 2. Trì hoãn việc phát Event một chút (50ms) 
+        // để trình duyệt kịp vẽ hiệu ứng Toast trước khi xử lý logic giỏ hàng
+        setTimeout(() => {
+            this.root.dispatchEvent(new CustomEvent('mon-an:order', {
+                bubbles: true,
+                detail: { item },
+            }));
+        }, 50);
     }
-    if (form.hinhAnh.files[0]) {
-      fd.append('HinhAnhFile', form.hinhAnh.files[0]);
-    }
-
-    submit.disabled = true;
-    label.textContent = 'Đang lưu…';
-
-    try {
-      if (isEdit) {
-        await MonAnApi.update(this._editingId, fd);
-        Toast.success('Cập nhật món ăn thành công!');
-      } else {
-        await MonAnApi.create(fd);
-        Toast.success('Thêm món ăn thành công!');
-      }
-      closeFn();
-      await this._loadItems();
-    } catch (err) {
-      Toast.error(err.message || 'Có lỗi xảy ra, thử lại sau!');
-      submit.disabled = false;
-      label.textContent = isEdit ? 'Lưu thay đổi' : 'Thêm món';
-    }
-  }
-
-  // ── Delete Confirm ───────────────────────────────────────────
-  _confirmDelete(item) {
-    this._modalEl.innerHTML = `
+    // ── Delete Confirm ───────────────────────────────────────────
+    _confirmDelete(item) {
+        this._modalEl.innerHTML = `
       <div class="modal-overlay" id="confirm-modal">
         <div class="modal" style="max-width:400px;text-align:center">
           <div style="font-size:2.5rem;margin-bottom:var(--space-4)">🗑️</div>
           <h3 class="modal__title" style="margin-bottom:var(--space-3)">Xoá món ăn?</h3>
-          <p style="color:var(--text-muted);font-size:var(--text-sm);margin-bottom:var(--space-8)">
-            Bạn có chắc muốn xoá <strong style="color:var(--text-primary)">${item.tenMonAn}</strong>?<br/>
-            Hành động này không thể hoàn tác.
+          <p style="color:var(--text-muted);margin-bottom:var(--space-8)">
+            Bạn có chắc muốn xoá <strong>${item.tenMonAn}</strong>?
           </p>
           <div style="display:flex;gap:var(--space-3);justify-content:center">
             <button class="btn btn-ghost" id="del-cancel">Huỷ</button>
@@ -392,37 +416,20 @@ export default class MonAnComponent {
       </div>
     `;
 
-    const overlay = this._modalEl.querySelector('#confirm-modal');
-    const close   = () => { this._modalEl.innerHTML = ''; };
-
-    this._modalEl.querySelector('#del-cancel').addEventListener('click', close);
-    overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
-
-    this._modalEl.querySelector('#del-confirm').addEventListener('click', async (e) => {
-      e.target.disabled = true;
-      e.target.textContent = 'Đang xoá…';
-      try {
-        await MonAnApi.delete(item.id);
-        Toast.success(`Đã xoá "${item.tenMonAn}"`);
-        close();
-        await this._loadItems();
-      } catch (err) {
-        Toast.error(err.message || 'Không thể xoá món ăn này');
-        close();
-      }
-    });
-  }
-
-  // ── Order Event (User mode) ───────────────────────────────────
-  _dispatchOrder(item) {
-    // Phát Custom Event lên DOM để trang chủ lắng nghe
-    this.root.dispatchEvent(new CustomEvent('mon-an:order', {
-      bubbles: true,
-      detail: { item },
-    }));
-  }
-}
-
+        const close = () => this._modalEl.innerHTML = '';
+        this._modalEl.querySelector('#del-cancel').addEventListener('click', close);
+        this._modalEl.querySelector('#del-confirm').addEventListener('click', async (e) => {
+            e.target.disabled = true;
+            try {
+                await MonAnApi.delete(item.id);
+                close();
+                Toast.success(`Đã xoá món ăn thành công`);
+                setTimeout(() => this._loadItems(), 500);
+            } catch (err) {
+                Toast.error(err.message);
+            }
+        });
+    }
 // ============================================================
 //  Inlined styles for MonAnComponent
 //  (injected once into <head> when module is loaded)

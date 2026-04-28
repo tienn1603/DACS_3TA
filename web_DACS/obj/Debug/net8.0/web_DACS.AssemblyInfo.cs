@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("web_DACS")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1fbed22fb47b70340256d66e18e993bafbfffbef")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f566d30f5ce242b3dcc842e8604b852cad9aa076")]
 [assembly: System.Reflection.AssemblyProductAttribute("web_DACS")]
 [assembly: System.Reflection.AssemblyTitleAttribute("web_DACS")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
