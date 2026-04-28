@@ -223,7 +223,29 @@ export default class DatBanComponent {
     if (tbody) tbody.innerHTML = `<tr><td colspan="6" style="color:var(--status-occupied);padding:var(--space-6);text-align:center">⚠️ ${msg}</td></tr>`;
   }
 }
+async function submitBooking() {
+    const resDateInput = document.getElementById('res-date').value;
 
+    const payload = {
+        tenKhachHang: document.getElementById('res-name').value,
+        soDienThoai: document.getElementById('res-phone').value,
+        // PHẢI dùng toISOString để Backend không bị lỗi thời gian
+        gioDenDuyKien: new Date(resDateInput).toISOString(),
+        banAnId: selectedTableId,
+        cartItems: currentCart
+    };
+
+    try {
+        const res = await DatBanApi.create(payload);
+        Toast.success("Đặt bàn thành công!");
+
+        // QUAN TRỌNG: Phải gọi lại hàm load bàn để nó đổi màu/khóa bàn
+        await loadTables();
+
+    } catch (e) {
+        Toast.error(e.message);
+    }
+}
 // ── Component-level styles ─────────────────────────────────────
 (function injectStyles() {
   if (document.getElementById('datban-component-styles')) return;

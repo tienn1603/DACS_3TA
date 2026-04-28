@@ -17,10 +17,10 @@ namespace web_DACS.Services.Implementations
 
         public async Task<ApiResponse> GetAllAsync()
         {
-            var items = await _banAnRepo.GetAllAsync();
+            // Sử dụng hàm repository mới mà chúng ta đã thống nhất trước đó
+            var items = await _banAnRepo.GetAllWithActiveBookingAsync();
             return ApiResponse.Ok("Lấy danh sách bàn ăn thành công.", items);
         }
-
         public async Task<ApiResponse> GetTableMapAsync(string? userId, bool isAdmin)
         {
             var now = DateTime.Now;
@@ -38,10 +38,17 @@ namespace web_DACS.Services.Implementations
 
             var result = listBanAn.Select(ban =>
             {
+                // Tìm đơn đặt bàn tương ứng với bàn này
                 var active = allActiveBookings.FirstOrDefault(d =>
                     d.BanAnId == ban.Id ||
                     (d.GhiChuGopBan != null && d.GhiChuGopBan.Split(',').Contains(ban.Id.ToString()))
                 );
+
+                string timeRange = "";
+                if (active != null)
+                {
+                    timeRange = $"{active.GioDenDuyKien:HH:mm} - {active.GioDenDuyKien.AddMinutes(1):HH:mm}";
+                }
 
                 return new
                 {
@@ -50,7 +57,9 @@ namespace web_DACS.Services.Implementations
                     soChoNgoi = ban.SoChoNgoi,
                     trangThai = ban.TrangThai,
                     isOwner = active != null && active.UserId == userId,
-                    bookingId = active?.Id
+                    bookingId = active?.Id,
+                    timeRange = timeRange, 
+                    tenKhach = active?.TenKhachHang 
                 };
             });
 

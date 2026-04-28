@@ -146,46 +146,51 @@ export function formatPrice(amount) {
   }).format(amount);
 }
 
-export function formatDate(date) {
-  return new Intl.DateTimeFormat('vi-VN', {
-    day: '2-digit', month: '2-digit', year: 'numeric',
-    hour: '2-digit', minute: '2-digit',
-  }).format(new Date(date));
+export function formatDate(dateString) {
+    if (!dateString) return "---";
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return "N/A";
+
+    return new Intl.DateTimeFormat('vi-VN', {
+        day: '2-digit', month: '2-digit', year: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+    }).format(date);
 }
 
+
 export const Toast = {
-  _container: null,
+    _container: null,
 
-  _getContainer() {
-    if (!this._container) {
-      this._container = document.querySelector('.toast-container');
-      if (!this._container) {
-        this._container = document.createElement('div');
-        this._container.className = 'toast-container';
-        document.body.appendChild(this._container);
-      }
-    }
-    return this._container;
-  },
+    _getContainer() {
+        if (!this._container) {
+            this._container = document.querySelector('.toast-container');
+            if (!this._container) {
+                this._container = document.createElement('div');
+                this._container.className = 'toast-container';
+                document.body.appendChild(this._container);
+            }
+        }
+        return this._container;
+    },
 
-  show(message, type = 'info', duration = 3500) {
-    const icons = { success: '✓', error: '✕', info: 'ℹ' };
-    const container = this._getContainer();
-    const toast = document.createElement('div');
-    toast.className = `toast toast-${type}`;
-    toast.innerHTML = `
-      <span style="font-size:1.1rem; flex-shrink:0">${icons[type]}</span>
-      <span>${message}</span>`;
-    container.appendChild(toast);
-    setTimeout(() => {
-      toast.style.animation = 'slideIn 0.3s ease reverse';
-      toast.addEventListener('animationend', () => toast.remove());
-    }, duration);
-  },
+    show(message, type = 'info', duration = 3500) {
+        const icons = { success: '✓', error: '✕', info: 'ℹ' };
+        const container = this._getContainer();
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.innerHTML = `
+      <span style="font-size:1.1rem; flex-shrink:0">${icons[type]}</span>
+      <span>${message}</span>`;
+        container.appendChild(toast);
+        setTimeout(() => {
+            toast.style.animation = 'slideIn 0.3s ease reverse';
+            toast.addEventListener('animationend', () => toast.remove());
+        }, duration);
+    },
 
-  success: (msg) => Toast.show(msg, 'success'),
-  error:   (msg) => Toast.show(msg, 'error'),
-  info:    (msg) => Toast.show(msg, 'info'),
+    success: (msg) => Toast.show(msg, 'success'),
+    error: (msg) => Toast.show(msg, 'error'),
+    info: (msg) => Toast.show(msg, 'info'),
 };
 
 export default { Auth, Account: AccountApi, MonAn: MonAnApi, BanAn: BanAnApi, DatBan: DatBanApi, Toast, getImageUrl, formatPrice, formatDate };

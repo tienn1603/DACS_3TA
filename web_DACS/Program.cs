@@ -60,6 +60,8 @@ builder.Services.AddScoped<IMonAnService, MonAnService>();
 builder.Services.AddScoped<IDatBanService, DatBanService>();
 builder.Services.AddScoped<IBanAnService, BanAnService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddHostedService<BookingWorker>();
+
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

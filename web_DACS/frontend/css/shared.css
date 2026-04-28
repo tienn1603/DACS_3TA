@@ -730,3 +730,150 @@ table.data-table {
   .section-header { flex-direction: column; align-items: flex-start; gap: var(--space-4); }
   .navbar__nav { display: none; }
 }
+/* ── Table Grid Custom Styles (Khóa bàn bận) ──────────────── */
+
+/* Container chứa các ô bàn */
+#table-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: var(--space-4);
+    margin-top: var(--space-4);
+}
+
+/* Ô bàn cơ bản (Trống - Màu xanh Teal nhạt) */
+.table-slot {
+    aspect-ratio: 1/1;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    position: relative;
+    color: var(--text-secondary);
+}
+
+    .table-slot:hover {
+        border-color: var(--accent-primary);
+        background: var(--accent-glow);
+        transform: translateY(-2px);
+    }
+
+    /* Bàn ĐÃ CHỌN (Màu xanh sóng biển của bạn) */
+    .table-slot.selected {
+        background: var(--accent-primary) !important;
+        border-color: var(--color-foam) !important;
+        color: var(--color-deep) !important;
+        box-shadow: var(--shadow-glow);
+        transform: scale(1.05);
+    }
+
+        .table-slot.selected .table-slot__num {
+            color: var(--color-deep);
+        }
+
+    /* BÀN ĐÃ ĐẶT / ĐANG DÙNG (Khóa màu đỏ) */
+    .table-slot.occupied {
+        background: rgba(224, 92, 92, 0.15) !important; /* Màu đỏ trong suốt nhẹ */
+        border: 1.5px solid var(--status-occupied) !important;
+        color: var(--status-occupied) !important;
+        cursor: not-allowed !important;
+        pointer-events: none; /* QUAN TRỌNG: Khóa hoàn toàn click chuột */
+        opacity: 0.8;
+    }
+
+        .table-slot.occupied::after {
+            content: 'Hết chỗ';
+            position: absolute;
+            bottom: -18px;
+            font-size: 9px;
+            color: var(--status-occupied);
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+.table-slot__num {
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+/* Icon khóa nhỏ ở góc bàn bận */
+.table-slot.occupied::before {
+    content: '🔒';
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    font-size: 10px;
+}
+
+/* Nhãn hiển thị thời gian giữ bàn trong Admin */
+.admin-timer-badge {
+    margin-top: var(--space-3);
+    padding: var(--space-2) var(--space-3);
+    background: rgba(255, 159, 67, 0.1); /* Màu cam nhạt khớp tone Admin */
+    border: 1px dashed #ff9f43; /* Viền đứt đoạn màu cam */
+    border-radius: var(--radius-md);
+    text-align: center;
+    display: block !important; /* Ép hiển thị */
+}
+
+    .admin-timer-badge small {
+        display: block;
+        font-size: 10px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        margin-bottom: 2px;
+    }
+
+    .admin-timer-badge strong {
+        font-size: var(--text-sm);
+        color: #ff9f43; /* Màu cam đặc trưng cho cảnh báo/thời gian */
+        font-family: var(--font-mono);
+    }
+/* Container chứa thời gian và tên khách */
+.booking-time-slot {
+    margin: 12px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Khối đen chứa giờ - Giống y hệt ảnh mẫu của bạn */
+.time-badge {
+    background: #1e2125; /* Màu nền tối */
+    color: #ffc107; /* Chữ vàng */
+    padding: 6px 12px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: bold;
+    font-size: 13px;
+    border: 1px solid rgba(255, 193, 7, 0.2);
+}
+
+    .time-badge .icon {
+        font-size: 14px;
+    }
+
+/* Tên khách hàng nhỏ bên dưới */
+.customer-name {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* Tùy chỉnh lại Card bàn cho cân đối */
+.banan-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    min-height: 220px;
+}
