@@ -13,5 +13,6 @@ namespace web_DACS.Data
         public DbSet<MonAn> MonAns { get; set; }
         public DbSet<DatBan> DatBans { get; set; }
         public DbSet<ChiTietDatMon> ChiTietDatMons { get; set; }
+        public DbSet<DanhGia> DanhGias { get; set; }
     }
 }

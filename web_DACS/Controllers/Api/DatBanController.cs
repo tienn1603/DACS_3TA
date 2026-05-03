@@ -102,5 +102,30 @@ namespace web_DACS.Controllers.Api
             if (!result.Status) return result;
             return result; // Trả thẳng ApiResponse
         }
+
+        [HttpPost("CreateDanhGia")]
+        [Authorize(Roles = "Admin,User")]
+        public async Task<IActionResult> CreateDanhGia([FromBody] DanhGiaRequest request)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized(ApiResponse.Fail("UserId không hợp lệ."));
+
+            if (request.SoSao < 1 || request.SoSao > 5)
+                return BadRequest(ApiResponse.Fail("Số sao phải từ 1 đến 5."));
+
+            var result = await _datBanService.CreateDanhGiaAsync(
+                request.DatBanId, userId, request.SoSao, request.NoiDung);
+            return result;
+        }
+
+        [HttpDelete("cancel-by-admin/{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> CancelByAdmin(int id)
+        {
+            var result = await _datBanService.CancelByAdminAsync(id);
+            if (!result.Status) return result;
+            return result;
+        }
     }
 }

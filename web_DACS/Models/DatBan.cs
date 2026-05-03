@@ -34,5 +34,6 @@ namespace web_DACS.Models
 
 
         public virtual ICollection<ChiTietDatMon> ChiTietDatMons { get; set; } = new List<ChiTietDatMon>();
+        public virtual ICollection<DanhGia> DanhGias { get; set; } = new List<DanhGia>();
     }
 }

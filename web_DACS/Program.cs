@@ -54,14 +54,16 @@ builder.Services.AddScoped<IBanAnRepository, BanAnRepository>();
 builder.Services.AddScoped<IDatBanRepository, DatBanRepository>();
 builder.Services.AddScoped<IMonAnRepository, MonAnRepository>();
 builder.Services.AddScoped<IChiTietDatMonRepository, ChiTietDatMonRepository>();
+builder.Services.AddScoped<IDanhGiaRepository, DanhGiaRepository>();
+
+// ── Background Services ───────────────────────────────────────
+builder.Services.AddHostedService<BookingWorker>();
 
 // ── Service Layer (N-Tier) ───────────────────────────────────
 builder.Services.AddScoped<IMonAnService, MonAnService>();
 builder.Services.AddScoped<IDatBanService, DatBanService>();
 builder.Services.AddScoped<IBanAnService, BanAnService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
-builder.Services.AddHostedService<BookingWorker>();
-
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

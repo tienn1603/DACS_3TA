@@ -343,6 +343,195 @@
       .stat-cards { grid-template-columns: 1fr 1fr; }
       .admin-panel { padding: var(--space-5); }
     }
+
+    /* ══════════════════════════════════════════════════════════
+       ĐẶT BÀN — Quản lý đặt bàn
+       ══════════════════════════════════════════════════════════ */
+
+    /* ── Section header ────────────────────────────── */
+    .db-section-header {
+      margin-bottom: var(--space-6);
+    }
+
+    .db-section-title__main {
+      font-family: var(--font-display);
+      font-size: var(--text-2xl);
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.2;
+      margin: 0;
+    }
+
+    .db-section-title__sub {
+      font-size: var(--text-sm);
+      color: var(--text-muted);
+      margin: var(--space-1) 0 0;
+    }
+
+    /* ── Toolbar + Filter chips ─────────────────────── */
+    .db-toolbar {
+      margin-bottom: var(--space-5);
+    }
+
+    .db-filter {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+    }
+
+    .db-filter__chip {
+      padding: 6px 16px;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--border-subtle);
+      background: transparent;
+      color: var(--text-muted);
+      font-family: var(--font-body);
+      font-size: var(--text-xs);
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .db-filter__chip:hover {
+      border-color: var(--accent-primary);
+      color: var(--accent-primary);
+      background: rgba(42, 171, 184, 0.06);
+    }
+
+    .db-filter__chip.active {
+      background: rgba(42, 171, 184, 0.14);
+      border-color: var(--border-active);
+      color: var(--accent-primary);
+    }
+
+    /* ── Table wrapper ──────────────────────────────── */
+    .db-table-wrap {
+      overflow-x: auto;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-card);
+    }
+
+    /* ── Table ──────────────────────────────────────── */
+    .db-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--text-sm);
+    }
+
+    .db-table thead {
+      background: var(--bg-surface);
+    }
+
+    .db-table th {
+      padding: var(--space-4) var(--space-5);
+      text-align: left;
+      font-size: var(--text-xs);
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border-subtle);
+      white-space: nowrap;
+    }
+
+    .db-table td {
+      padding: var(--space-4) var(--space-5);
+      color: var(--text-secondary);
+      border-bottom: 1px solid var(--border-subtle);
+      vertical-align: middle;
+    }
+
+    .db-table tbody tr:last-child td { border-bottom: none; }
+
+    .db-table tbody tr {
+      transition: background var(--transition-fast);
+    }
+
+    .db-table tbody tr:hover {
+      background: rgba(42, 171, 184, 0.04);
+    }
+
+    /* ── Cell variants ──────────────────────────────── */
+    .db-td--id {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .db-td--name {
+      max-width: 200px;
+    }
+
+    .db-td--center {
+      text-align: center;
+    }
+
+    /* Truncation helpers */
+    .db-cell-truncate {
+      display: block;
+      font-weight: 500;
+      color: var(--text-primary);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 100%;
+    }
+
+    .db-cell-muted {
+      display: block;
+      font-size: var(--text-xs);
+      color: var(--text-muted);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* ── Actions cell ──────────────────────────────── */
+    .db-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      flex-wrap: wrap;
+    }
+
+    /* ── Status badge variants ─────────────────────── */
+    .badge.badge-expired   { color: var(--text-muted)        !important; background: rgba(200, 234, 237, 0.06) !important; }
+    .badge.badge-completed { color: var(--status-available)   !important; background: rgba(46, 204, 138, 0.12) !important; }
+
+    /* ── Success button (thanh toán) ─────────────── */
+    .btn-success {
+      background: rgba(46, 204, 138, 0.12);
+      color: #2ecc8a;
+      border: 1px solid rgba(46, 204, 138, 0.3);
+      border-radius: var(--radius-md);
+      padding: var(--space-2) var(--space-4);
+      font-family: var(--font-body);
+      font-size: var(--text-xs);
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .btn-success:hover {
+      background: rgba(46, 204, 138, 0.22);
+      border-color: rgba(46, 204, 138, 0.6);
+    }
+
+    /* ── Responsive ───────────────────────────────── */
+    @media (max-width: 768px) {
+      .db-filter__chip {
+        padding: 5px 12px;
+        font-size: 0.7rem;
+      }
+      .db-table th,
+      .db-table td {
+        padding: var(--space-3) var(--space-4);
+      }
+    }
   </style>
 </head>
 <body>
@@ -565,7 +754,7 @@
     return banAnComp;
   }
   function getDatBanComp() {
-    if (!datBanComp) datBanComp = new DatBanComponent('#datban-root');
+    if (!datBanComp) datBanComp = new DatBanComponent('#datban-root', { admin: true });
     return datBanComp;
   }
 
@@ -656,33 +845,6 @@
       console.error('Dashboard error:', err);
     }
   }
-
-  // ── Panel switch ───────────────────────────────────────────
-  document.querySelectorAll('.sidebar__item[data-panel]').forEach(item => {
-    item.addEventListener('click', () => {
-      const panel = item.dataset.panel;
-      document.querySelectorAll('.sidebar__item').forEach(i => i.classList.remove('active'));
-      document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
-      item.classList.add('active');
-      document.getElementById(`panel-${panel}`).classList.add('active');
-      document.getElementById('topbar-title').innerHTML = titleMap[panel] || panel;
-
-      // Init component lazily (once per panel)
-      if (panel === 'monan')  getMonAnComp().init();
-      if (panel === 'banan')  getBanAnComp().init();
-      if (panel === 'datban') getDatBanComp().init();
-    });
-  });
-
-  // Refresh button — reload active component + dashboard
-  document.getElementById('btn-refresh').addEventListener('click', () => {
-    loadDashboard();
-    const activeId = document.querySelector('.admin-panel.active')?.id;
-    if (activeId === 'panel-monan')  getMonAnComp().reload();
-    if (activeId === 'panel-banan')  getBanAnComp().reload();
-    if (activeId === 'panel-datban') getDatBanComp().reload();
-    Toast.info('Đã làm mới dữ liệu');
-  });
 
   // ── Init ─────────────────────────────────────────────
   loadDashboard();

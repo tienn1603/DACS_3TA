@@ -430,6 +430,7 @@ export default class MonAnComponent {
             }
         });
     }
+  }
 // ============================================================
 //  Inlined styles for MonAnComponent
 //  (injected once into <head> when module is loaded)

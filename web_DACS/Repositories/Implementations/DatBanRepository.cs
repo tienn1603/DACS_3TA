@@ -18,6 +18,7 @@ namespace web_DACS.Repositories.Implementations
             return await _context.DatBans
                 .Include(d => d.BanAn)
                 .Include(d => d.ChiTietDatMons).ThenInclude(ct => ct.MonAn)
+                .Include(d => d.DanhGias)
                 .OrderByDescending(d => d.NgayDat)
                 .ToListAsync();
         }
@@ -109,6 +110,8 @@ namespace web_DACS.Repositories.Implementations
             {
                 var donDat = await _context.DatBans
                     .Include(d => d.BanAn)
+                    .Include(d => d.ChiTietDatMons).ThenInclude(ct => ct.MonAn)
+                    .Include(d => d.DanhGias)
                     .FirstOrDefaultAsync(d => d.Id == datBanId);
 
                 if (donDat == null)
@@ -116,6 +119,13 @@ namespace web_DACS.Repositories.Implementations
                     return false;
                 }
 
+                // Chỉ cho phép thanh toán khi đơn đang ở trạng thái Đang dùng (1)
+                if (donDat.TrangThai != 1)
+                {
+                    return false;
+                }
+
+                // Giải phóng bàn (gộp bàn hoặc bàn đơn)
                 if (!string.IsNullOrEmpty(donDat.GhiChuGopBan))
                 {
                     var ids = donDat.GhiChuGopBan.Split(',').Select(int.Parse);
@@ -130,15 +140,12 @@ namespace web_DACS.Repositories.Implementations
                     donDat.BanAn.TrangThai = 0;
                 }
 
-                var chiTietMons = await _context.ChiTietDatMons
-                    .Where(c => c.DatBanId == datBanId)
-                    .ToListAsync();
-                if (chiTietMons.Count > 0)
-                {
-                    _context.ChiTietDatMons.RemoveRange(chiTietMons);
-                }
+                // KHÔNG xóa chi tiết món — giữ lại để hiển thị trong trang chi tiết đặt bàn
 
-                _context.DatBans.Remove(donDat);
+                // Đánh dấu hoàn thành (4)
+                donDat.TrangThai = 4;
+                _context.DatBans.Update(donDat);
+
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
                 return true;
@@ -155,6 +162,7 @@ namespace web_DACS.Repositories.Implementations
             return await _context.DatBans
                 .Include(d => d.BanAn)
                 .Include(d => d.ChiTietDatMons).ThenInclude(ct => ct.MonAn)
+                .Include(d => d.DanhGias)
                 .Where(d => d.UserId == userId)
                 .OrderByDescending(d => d.NgayDat)
                 .ToListAsync();
@@ -211,6 +219,45 @@ namespace web_DACS.Repositories.Implementations
             if (donDat.BanAn != null) donDat.BanAn.TrangThai = 2;
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<bool> CancelPendingBookingByAdminAsync(int datBanId)
+        {
+            await using IDbContextTransaction transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                var donDat = await _context.DatBans
+                    .Include(d => d.BanAn)
+                    .FirstOrDefaultAsync(d => d.Id == datBanId);
+
+                if (donDat == null || donDat.TrangThai == 4 || donDat.TrangThai == -1)
+                {
+                    return false;
+                }
+
+                donDat.TrangThai = -1;
+                if (donDat.BanAn != null)
+                {
+                    donDat.BanAn.TrangThai = 0;
+                }
+
+                var chiTietMons = await _context.ChiTietDatMons
+                    .Where(c => c.DatBanId == datBanId)
+                    .ToListAsync();
+                if (chiTietMons.Count > 0)
+                {
+                    _context.ChiTietDatMons.RemoveRange(chiTietMons);
+                }
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+                return true;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
     }
 }
