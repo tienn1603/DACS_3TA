@@ -18,6 +18,8 @@ namespace web_DACS.Services.Interfaces
         Task<ApiResponse> GetActiveBookingsAsync();
         Task<ApiResponse> ProcessExpiredPendingBookingsAsync();
         Task<ApiResponse> ConfirmBookingAsync(int datBanId);
+        Task<ApiResponse> CreateDanhGiaAsync(int datBanId, string userId, int soSao, string? noiDung);
+        Task<ApiResponse> CancelByAdminAsync(int datBanId);
 
     }
 }

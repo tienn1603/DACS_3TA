@@ -148,6 +148,22 @@
   },
   {
     "ContainingType": "web_DACS.Controllers.Api.DatBanController",
+    "Method": "CancelByAdmin",
+    "RelativePath": "api/DatBan/cancel-by-admin/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "web_DACS.Controllers.Api.DatBanController",
     "Method": "CancelBooking",
     "RelativePath": "api/DatBan/cancel/{id}",
     "HttpMethod": "DELETE",
@@ -205,6 +221,22 @@
       {
         "Name": "request",
         "Type": "web_DACS.DTOs.BookingRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "web_DACS.Controllers.Api.DatBanController",
+    "Method": "CreateDanhGia",
+    "RelativePath": "api/DatBan/CreateDanhGia",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "web_DACS.DTOs.DanhGiaRequest",
         "IsRequired": true
       }
     ],

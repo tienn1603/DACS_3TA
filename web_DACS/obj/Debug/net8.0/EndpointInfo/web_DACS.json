@@ -330,6 +330,60 @@
         }
       }
     },
+    "/api/DatBan/CreateDanhGia": {
+      "post": {
+        "tags": [
+          "DatBan"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DanhGiaRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DanhGiaRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/DanhGiaRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/DatBan/cancel-by-admin/{id}": {
+      "delete": {
+        "tags": [
+          "DatBan"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/MonAn": {
       "get": {
         "tags": [
@@ -692,6 +746,24 @@
           "soChoNgoi": {
             "type": "integer",
             "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "DanhGiaRequest": {
+        "type": "object",
+        "properties": {
+          "datBanId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "soSao": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "noiDung": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false

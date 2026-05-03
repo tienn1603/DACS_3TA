@@ -62,4 +62,11 @@ namespace web_DACS.DTOs
             return true;
         }
     }
+
+    public class DanhGiaRequest
+    {
+        public int DatBanId { get; set; }
+        public int SoSao { get; set; }
+        public string? NoiDung { get; set; }
+    }
 }

@@ -528,5 +528,5 @@ D:\web\DACS_3TA\web_DACS\obj\Debug\net8.0\web_DACS.genruntimeconfig.cache
 D:\web\DACS_3TA\web_DACS\obj\Debug\net8.0\ref\web_DACS.dll
 D:\web\DACS_3TA\web_DACS\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
 D:\web\DACS_3TA\web_DACS\bin\Debug\net8.0\web_DACS.exe
-D:\web\DACS_3TA\web_DACS\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
 D:\doancoso\DACS_3TA\web_DACS\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+D:\web\DACS_3TA\web_DACS\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

@@ -1,21 +1,23 @@
 ﻿using web_DACS.Services.Interfaces;
 
-public class BookingWorker : BackgroundService
+namespace web_DACS.Services.Implementations
 {
-    private readonly IServiceProvider _serviceProvider;
-    public BookingWorker(IServiceProvider serviceProvider) => _serviceProvider = serviceProvider;
-
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    public class BookingWorker : BackgroundService
     {
-        while (!stoppingToken.IsCancellationRequested)
+        private readonly IServiceProvider _serviceProvider;
+        public BookingWorker(IServiceProvider serviceProvider) => _serviceProvider = serviceProvider;
+
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            using (var scope = _serviceProvider.CreateScope())
+            while (!stoppingToken.IsCancellationRequested)
             {
-                var service = scope.ServiceProvider.GetRequiredService<IDatBanService>();
-                // Gọi hàm xử lý quá hạn (bạn cần viết hàm này trong Service)
-                await service.ProcessExpiredPendingBookingsAsync();
+                using (var scope = _serviceProvider.CreateScope())
+                {
+                    var service = scope.ServiceProvider.GetRequiredService<IDatBanService>();
+                    await service.ProcessExpiredPendingBookingsAsync();
+                }
+                await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
             }
-            await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
         }
     }
 }

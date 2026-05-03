@@ -119,9 +119,11 @@ export const DatBanApi = {
   create:        (payload) => post('/api/DatBan/Create', payload),
   getMyHistory:  () => get('/api/DatBan/my-history'),
   getAll:        () => get('/api/DatBan'),
-  cancel:        (id) => post(`/api/DatBan/cancel/${id}`),
+  cancel:        (id) => del(`/api/DatBan/cancel/${id}`),
   confirmPayment:(id) => post(`/api/DatBan/ConfirmPayment/${id}`),
   confirmBooking:(id) => post(`/api/DatBan/ConfirmBooking/${id}`),
+  submitRating:  (payload) => post('/api/DatBan/CreateDanhGia', payload),
+  cancelByAdmin: (id) => del(`/api/DatBan/cancel-by-admin/${id}`),
 };
 
 // ── Utilities ────────────────────────────────────────────────

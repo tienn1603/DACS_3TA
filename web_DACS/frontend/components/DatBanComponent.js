@@ -4,36 +4,26 @@
 //  Depends on: ../js/apiClient.js, shared.css
 // ============================================================
 
-import { DatBanApi, formatDate, Toast } from '../js/apiClient.js';
+import { DatBanApi, formatDate, formatPrice, Toast } from '../js/apiClient.js';
 
 export default class DatBanComponent {
-  /**
-   * @param {string|HTMLElement} container  — selector or element
-   */
-  constructor(container) {
+  constructor(container, options = {}) {
     this.root     = typeof container === 'string'
       ? document.querySelector(container)
       : container;
+    this.isAdmin  = options.admin ?? false;
     this.items    = [];
     this.filtered = [];
     this.filter   = 'all';
     this._modalEl = null;
   }
 
-  // ── Public API ──────────────────────────────────────────────
-  async init() {
-    await this._loadItems();
-  }
+  async init() { await this._loadItems(); }
+  async reload() { await this._loadItems(); }
 
-  async reload() {
-    await this._loadItems();
-  }
-
-  // ── Data ────────────────────────────────────────────────────
   async _loadItems() {
     this._setLoading(true);
     try {
-      // API trả JSON camelCase (ApiResponse dùng CamelCase naming policy)
       this.items = (await DatBanApi.getAll()).map(r => ({
         id:             r.id ?? r.Id ?? 0,
         tenKhachHang:   r.tenKhachHang ?? r.TenKhachHang ?? '',
@@ -52,6 +42,9 @@ export default class DatBanComponent {
           tenMon:   ct.monAn?.tenMon ?? ct.MonAn?.TenMon ?? ct.monAn?.tenMonAn ?? '',
           hinhAnh:  ct.monAn?.hinhAnh ?? ct.MonAn?.HinhAnh ?? '',
         })),
+        danhGia: Array.isArray(r.danhGias)
+          ? (r.danhGias[0] ?? r.DanhGias?.[0] ?? null)
+          : (r.danhGia ?? r.DanhGia ?? null),
       }));
       this._render();
     } catch (err) {
@@ -61,9 +54,11 @@ export default class DatBanComponent {
     }
   }
 
-  // ── Filter ──────────────────────────────────────────────────
   _applyFilter() {
-    const map = { all: null, pending: 0, confirmed: 1, occupied: 2, expired: 3, cancelled: -1 };
+    const map = {
+      all: null, pending: 0, confirmed: 1, occupied: 2,
+      expired: 3, cancelled: -1, completed: 4,
+    };
     const numeric = map[this.filter] ?? null;
     this.filtered = numeric === null
       ? [...this.items]
@@ -71,22 +66,26 @@ export default class DatBanComponent {
     this._renderTable();
   }
 
-  // ── Full Render ─────────────────────────────────────────────
   _render() {
     if (!this._modalEl) {
       this.root.innerHTML = `
-        <div class="datban-toolbar">
-          <div id="datban-filter" class="filter-group">
-            <button class="filter-chip active" data-filter="all">Tất cả</button>
-            <button class="filter-chip" data-filter="pending">Chờ xác nhận</button>
-            <button class="filter-chip" data-filter="confirmed">Đã xác nhận</button>
-            <button class="filter-chip" data-filter="occupied">Đang dùng</button>
-            <button class="filter-chip" data-filter="expired">Hết hạn</button>
-            <button class="filter-chip" data-filter="cancelled">Đã hủy</button>
+        <div class="db-section-header">
+          <div class="db-section-title">
+  
           </div>
         </div>
-        <div class="table-responsive">
-          <table class="datban-table">
+        <div class="db-toolbar">
+          <div id="datban-filter" class="db-filter">
+            <button class="db-filter__chip active" data-filter="all">Tất cả</button>
+            <button class="db-filter__chip" data-filter="pending">Chờ xác nhận</button>
+            <button class="db-filter__chip" data-filter="confirmed">Đã xác nhận</button>
+            <button class="db-filter__chip" data-filter="expired">Hết hạn</button>
+            <button class="db-filter__chip" data-filter="cancelled">Đã hủy</button>
+            <button class="db-filter__chip" data-filter="completed">Hoàn thành</button>
+          </div>
+        </div>
+        <div class="db-table-wrap">
+          <table class="db-table">
             <thead>
               <tr>
                 <th>ID</th>
@@ -106,20 +105,18 @@ export default class DatBanComponent {
       this.root.appendChild(this._modalEl);
 
       this.root.querySelector('#datban-filter').addEventListener('click', e => {
-        const chip = e.target.closest('.filter-chip');
+        const chip = e.target.closest('.db-filter__chip');
         if (!chip) return;
-        this.root.querySelectorAll('#datban-filter .filter-chip')
+        this.root.querySelectorAll('.db-filter__chip')
           .forEach(c => c.classList.remove('active'));
         chip.classList.add('active');
         this.filter = chip.dataset.filter;
         this._applyFilter();
       });
     }
-
     this._applyFilter();
   }
 
-  // ── Table Render ────────────────────────────────────────────
   _renderTable() {
     const tbody = this.root.querySelector('#datban-tbody');
 
@@ -136,41 +133,73 @@ export default class DatBanComponent {
       return;
     }
 
-    const badgeClass = { 0:'badge-pending', 1:'badge-confirmed', 2:'badge-reserved', 3:'badge-reserved', '-1':'badge-cancelled' };
-    const label      = { 0:'Chờ xác nhận', 1:'Đã xác nhận', 2:'Đang dùng', 3:'Hết hạn', '-1':'Đã hủy' };
+    const statusConfig = {
+      0:   { label: 'Chờ xác nhận', bgColor: '#fef3c7', textColor: '#b45309' },
+      1:   { label: 'Đã xác nhận',  bgColor: '#dbeafe', textColor: '#1d4ed8' },
+      2:   { label: 'Đang dùng',    bgColor: '#ccfbf1', textColor: '#0f766e' },
+      3:   { label: 'Hết hạn',       bgColor: '#f3f4f6', textColor: '#6b7280' },
+      '-1': { label: 'Đã hủy',       bgColor: '#fee2e2', textColor: '#991b1b' },
+      4:   { label: 'Hoàn thành',    bgColor: '#d1fae5', textColor: '#065f46' },
+    };
 
-    tbody.innerHTML = this.filtered.map(r => `
-      <tr data-id="${r.id}">
-        <td style="font-family:var(--font-mono);font-size:var(--text-xs);color:var(--text-muted)">#${r.id}</td>
-        <td>
-          <div style="font-weight:500;color:var(--text-primary)">${r.tenKhachHang}</div>
-          <div style="font-size:var(--text-xs);color:var(--text-muted)">${r.soDienThoai}</div>
-        </td>
-        <td>${r.soBan}</td>
-        <td>${formatDate(r.ngayDat)}</td>
-        <td><span class="badge ${badgeClass[r.trangThai] || 'badge-pending'}">${label[r.trangThai] || (r.trangThai ?? '?')}</span></td>
-        <td>
-          <div style="display:flex;gap:var(--space-2);align-items:center;flex-wrap:wrap">
-            <a class="btn btn-ghost btn-sm" href="reservation-detail.html?id=${r.id}" title="Xem chi tiết">🔍</a>
-            ${r.trangThai === 0 ? `
-              <button class="btn btn-primary btn-sm" data-action="confirm" data-id="${r.id}" title="Xác nhận đặt bàn">✓</button>
-              <button class="btn btn-danger btn-sm" data-action="cancel" data-id="${r.id}">Hủy</button>
-            ` : r.trangThai === 1 ? `
-              <button class="btn btn-success btn-sm" data-action="pay" data-id="${r.id}" title="Thanh toán">TT</button>
-              <button class="btn btn-danger btn-sm" data-action="cancel" data-id="${r.id}">Hủy</button>
-            ` : '—'}
-          </div>
-        </td>
-      </tr>
-    `).join('');
+    tbody.innerHTML = this.filtered.map(r => {
+      const key = String(r.trangThai);
+      const cfg = statusConfig[key] || { label: key, bgColor: '#f3f4f6', textColor: '#6b7280' };
+
+      let actions = '—';
+
+      if (this.isAdmin) {
+        if (r.trangThai === 0) {
+          actions = `
+            <button class="btn btn-primary btn-sm" data-action="confirm" data-id="${r.id}">✓</button>
+            <button class="btn btn-danger btn-sm" data-action="cancel-admin" data-id="${r.id}">Hủy</button>`;
+        } else if (r.trangThai === 1) {
+          actions = `
+            <button class="btn btn-success btn-sm" data-action="pay" data-id="${r.id}">TT</button>
+            <button class="btn btn-danger btn-sm" data-action="cancel-admin" data-id="${r.id}">Hủy</button>`;
+        } else if (r.trangThai === 4) {
+          actions = '—';
+        }
+      } else {
+        if (r.trangThai === 0) {
+          actions = `<button class="btn btn-danger btn-sm" data-action="cancel" data-id="${r.id}">Hủy</button>`;
+        }
+      }
+
+      return `
+        <tr data-id="${r.id}">
+          <td style="font-family:var(--font-mono);font-size:var(--text-xs);color:var(--text-muted)">#${r.id}</td>
+          <td>
+            <div style="font-weight:500;color:var(--text-primary)">${r.tenKhachHang}</div>
+            <div style="font-size:var(--text-xs);color:var(--text-muted)">${r.soDienThoai}</div>
+          </td>
+          <td>${r.soBan}</td>
+          <td>${formatDate(r.ngayDat)}</td>
+          <td>
+            <span style="display:inline-block;padding:3px 10px;border-radius:12px;font-size:var(--text-xs);font-weight:600;
+              color:${cfg.textColor};background:${cfg.bgColor}">
+              ${cfg.label}
+            </span>
+          </td>
+          <td>
+            <div style="display:flex;gap:var(--space-2);align-items:center;flex-wrap:wrap">
+              <button class="btn btn-ghost btn-sm" data-action="detail" data-id="${r.id}" title="Xem chi tiết">🔍</button>
+              ${actions}
+            </div>
+          </td>
+        </tr>`;
+    }).join('');
 
     tbody.querySelectorAll('[data-action]').forEach(btn => {
       btn.addEventListener('click', () => {
-        const id   = parseInt(btn.dataset.id, 10);
-        const item = this.items.find(r => r.id === id);
-        if (btn.dataset.action === 'confirm') this._confirmBooking(item);
-        if (btn.dataset.action === 'pay')     this._confirmPayment(item);
-        if (btn.dataset.action === 'cancel')  this._confirmCancel(item);
+        const id    = parseInt(btn.dataset.id, 10);
+        const item  = this.items.find(r => r.id === id);
+        const action = btn.dataset.action;
+        if (action === 'confirm')       this._confirmBooking(item);
+        if (action === 'pay')          this._confirmPayment(item);
+        if (action === 'cancel')       this._confirmCancel(item);
+        if (action === 'cancel-admin') this._confirmCancelAdmin(item);
+        if (action === 'detail')       this._showDetail(item);
       });
     });
   }
@@ -193,6 +222,7 @@ export default class DatBanComponent {
       await DatBanApi.confirmPayment(item.id);
       Toast.success('Đã thanh toán và giải phóng bàn');
       await this._loadItems();
+      window.location.href = `reservation-detail.html?id=${item.id}`;
     } catch (err) {
       Toast.error(err.message || 'Lỗi thanh toán');
     }
@@ -209,7 +239,74 @@ export default class DatBanComponent {
     }
   }
 
-  // ── Loading / Error ──────────────────────────────────────────
+  async _confirmCancelAdmin(item) {
+    if (!confirm(`Hủy đơn đặt bàn #${item.id} của "${item.tenKhachHang}"?\nBàn sẽ được giải phóng.`)) return;
+    try {
+      await DatBanApi.cancelByAdmin(item.id);
+      Toast.success('Đã hủy đơn thành công');
+      await this._loadItems();
+    } catch (err) {
+      Toast.error(err.message || 'Lỗi hủy đơn');
+    }
+  }
+
+  _showDetail(item) {
+    const chiTiet = item.chiTietDatMons || [];
+    const total   = chiTiet.reduce((s, ct) => s + (ct.soLuong * ct.gia), 0);
+
+    const chiTietHtml = chiTiet.length
+      ? chiTiet.map(ct => `
+          <div style="display:flex;justify-content:space-between;padding:var(--space-2) 0;border-bottom:1px solid var(--border-subtle)">
+            <span style="color:var(--text-secondary)">${ct.tenMon} × ${ct.soLuong}</span>
+            <span style="color:var(--accent-primary)">${formatPrice(ct.soLuong * ct.gia)}</span>
+          </div>`).join('')
+      : '<p style="color:var(--text-muted);font-size:var(--text-sm)">Không có món ăn kèm</p>';
+
+    this._modalEl.innerHTML = `
+      <div class="modal-overlay" id="detail-modal">
+        <div class="modal" style="max-width:500px">
+          <div class="modal__header">
+            <h3 class="modal__title">Chi tiết đơn #${item.id}</h3>
+            <button class="modal__close detail-close-btn">✕</button>
+          </div>
+          <div style="padding:var(--space-5);display:flex;flex-direction:column;gap:var(--space-4)">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4)">
+              <div>
+                <div style="font-size:var(--text-xs);color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em">Khách hàng</div>
+                <div style="font-size:var(--text-sm);margin-top:2px">${item.tenKhachHang}</div>
+              </div>
+              <div>
+                <div style="font-size:var(--text-xs);color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em">SĐT</div>
+                <div style="font-size:var(--text-sm);margin-top:2px">${item.soDienThoai}</div>
+              </div>
+              <div>
+                <div style="font-size:var(--text-xs);color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em">Ngày đặt</div>
+                <div style="font-size:var(--text-sm);margin-top:2px">${formatDate(item.ngayDat)}</div>
+              </div>
+              <div>
+                <div style="font-size:var(--text-xs);color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em">Giờ đến</div>
+                <div style="font-size:var(--text-sm);margin-top:2px">${formatDate(item.gioDenDuyKien)}</div>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:var(--text-xs);color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:var(--space-3)">Món đã đặt</div>
+              ${chiTietHtml}
+            </div>
+            ${chiTiet.length ? `
+            <div style="display:flex;justify-content:space-between;align-items:center;padding-top:var(--space-3);border-top:2px solid var(--border-subtle)">
+              <span style="font-weight:600;color:var(--text-primary)">Tổng cộng</span>
+              <span style="font-family:var(--font-display);font-size:var(--text-xl);color:var(--accent-primary)">${formatPrice(total)}</span>
+            </div>` : ''}
+          </div>
+        </div>
+      </div>
+    `;
+
+    const modal = this._modalEl.querySelector('#detail-modal');
+    modal.querySelector('.detail-close-btn').addEventListener('click', () => { this._modalEl.innerHTML = ''; });
+    modal.addEventListener('click', e => { if (e.target === modal) this._modalEl.innerHTML = ''; });
+  }
+
   _setLoading(val) {
     const tbody = this.root.querySelector('#datban-tbody');
     if (!tbody) return;
@@ -223,56 +320,3 @@ export default class DatBanComponent {
     if (tbody) tbody.innerHTML = `<tr><td colspan="6" style="color:var(--status-occupied);padding:var(--space-6);text-align:center">⚠️ ${msg}</td></tr>`;
   }
 }
-async function submitBooking() {
-    const resDateInput = document.getElementById('res-date').value;
-
-    const payload = {
-        tenKhachHang: document.getElementById('res-name').value,
-        soDienThoai: document.getElementById('res-phone').value,
-        // PHẢI dùng toISOString để Backend không bị lỗi thời gian
-        gioDenDuyKien: new Date(resDateInput).toISOString(),
-        banAnId: selectedTableId,
-        cartItems: currentCart
-    };
-
-    try {
-        const res = await DatBanApi.create(payload);
-        Toast.success("Đặt bàn thành công!");
-
-        // QUAN TRỌNG: Phải gọi lại hàm load bàn để nó đổi màu/khóa bàn
-        await loadTables();
-
-    } catch (e) {
-        Toast.error(e.message);
-    }
-}
-// ── Component-level styles ─────────────────────────────────────
-(function injectStyles() {
-  if (document.getElementById('datban-component-styles')) return;
-  const style = document.createElement('style');
-  style.id = 'datban-component-styles';
-  style.textContent = `
-    .datban-toolbar { margin-bottom: var(--space-6); }
-    .table-responsive { overflow-x: auto; }
-    .datban-table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); }
-    .datban-table th {
-      text-align: left; padding: var(--space-3) var(--space-4);
-      border-bottom: 2px solid var(--border-subtle); color: var(--text-muted);
-      font-weight: 500; font-size: var(--text-xs); text-transform: uppercase;
-      letter-spacing: 0.05em; white-space: nowrap;
-    }
-    .datban-table td { padding: var(--space-4); border-bottom: 1px solid var(--border-subtle); vertical-align: middle; }
-    .datban-table tr:hover td { background: rgba(255,255,255,0.02); }
-    .badge-confirmed { background: #d1fae5; color: #065f46; }
-    .badge-cancelled { background: #fee2e2; color: #991b1b; }
-    .filter-group { display: flex; gap: var(--space-2); flex-wrap: wrap; }
-    .filter-chip {
-      padding: var(--space-1) var(--space-4); border-radius: 20px;
-      border: 1px solid var(--border-subtle); background: transparent;
-      color: var(--text-muted); font-size: var(--text-sm); cursor: pointer; transition: all 0.2s;
-    }
-    .filter-chip:hover { border-color: var(--primary); color: var(--primary); }
-    .filter-chip.active { background: var(--primary); border-color: var(--primary); color: #fff; }
-  `;
-  document.head.appendChild(style);
-})();

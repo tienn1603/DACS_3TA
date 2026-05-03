@@ -22,32 +22,6 @@ namespace web_DACS.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("ChiTietDatBan", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("DatBanId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("MonAnId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SoLuong")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DatBanId");
-
-                    b.HasIndex("MonAnId");
-
-                    b.ToTable("ChiTietDatBans");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -293,7 +267,7 @@ namespace web_DACS.Migrations
                     b.Property<int>("BanAnId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("DatBanId")
+                    b.Property<int>("DatBanId")
                         .HasColumnType("int");
 
                     b.Property<int>("MonAnId")
@@ -304,13 +278,43 @@ namespace web_DACS.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BanAnId");
-
                     b.HasIndex("DatBanId");
 
                     b.HasIndex("MonAnId");
 
                     b.ToTable("ChiTietDatMons");
+                });
+
+            modelBuilder.Entity("web_DACS.Models.DanhGia", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("DatBanId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("NgayDanhGia")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("NoiDung")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("SoSao")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DatBanId");
+
+                    b.ToTable("DanhGias");
                 });
 
             modelBuilder.Entity("web_DACS.Models.DatBan", b =>
@@ -382,25 +386,6 @@ namespace web_DACS.Migrations
                     b.ToTable("MonAns");
                 });
 
-            modelBuilder.Entity("ChiTietDatBan", b =>
-                {
-                    b.HasOne("web_DACS.Models.DatBan", "DatBan")
-                        .WithMany("ChiTietDatBans")
-                        .HasForeignKey("DatBanId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("web_DACS.Models.MonAn", "MonAn")
-                        .WithMany()
-                        .HasForeignKey("MonAnId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("DatBan");
-
-                    b.Navigation("MonAn");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -454,15 +439,11 @@ namespace web_DACS.Migrations
 
             modelBuilder.Entity("web_DACS.Models.ChiTietDatMon", b =>
                 {
-                    b.HasOne("web_DACS.Models.BanAn", "BanAn")
-                        .WithMany()
-                        .HasForeignKey("BanAnId")
+                    b.HasOne("web_DACS.Models.DatBan", "DatBan")
+                        .WithMany("ChiTietDatMons")
+                        .HasForeignKey("DatBanId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("web_DACS.Models.DatBan", "DatBan")
-                        .WithMany()
-                        .HasForeignKey("DatBanId");
 
                     b.HasOne("web_DACS.Models.MonAn", "MonAn")
                         .WithMany()
@@ -470,11 +451,20 @@ namespace web_DACS.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("BanAn");
-
                     b.Navigation("DatBan");
 
                     b.Navigation("MonAn");
+                });
+
+            modelBuilder.Entity("web_DACS.Models.DanhGia", b =>
+                {
+                    b.HasOne("web_DACS.Models.DatBan", "DatBan")
+                        .WithMany("DanhGias")
+                        .HasForeignKey("DatBanId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("DatBan");
                 });
 
             modelBuilder.Entity("web_DACS.Models.DatBan", b =>
@@ -495,7 +485,9 @@ namespace web_DACS.Migrations
 
             modelBuilder.Entity("web_DACS.Models.DatBan", b =>
                 {
-                    b.Navigation("ChiTietDatBans");
+                    b.Navigation("ChiTietDatMons");
+
+                    b.Navigation("DanhGias");
                 });
 #pragma warning restore 612, 618
         }

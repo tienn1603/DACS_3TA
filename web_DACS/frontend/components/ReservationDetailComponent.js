@@ -117,6 +117,7 @@ export default class ReservationDetailComponent {
       2: { label: 'Đang dùng',    badge: 'badge-reserved',  icon: '🍽️' },
       3: { label: 'Hết hạn',      badge: 'badge-reserved',  icon: '⏰' },
      '-1': { label: 'Đã hủy',      badge: 'badge-cancelled', icon: '✕'  },
+      4: { label: 'Hoàn thành',   badge: 'badge-completed', icon: '🎉' },
     };
     const cfg = statusCfg[st] ?? statusCfg[0];
 
@@ -125,24 +126,32 @@ export default class ReservationDetailComponent {
     const isPending   = st === 0;
     const isConfirmed = st === 1;
     const isOccupied  = st === 2;
-
+    const isCompleted = st === 4;
     const steps = isCancelled
       ? [
           { label: 'Đặt bàn',  done: true,  active: false, cancelled: false },
           { label: 'Đã hủy',   done: false, active: true,  cancelled: true  },
         ]
+      : isCompleted
+      ? [
+          { label: 'Đặt bàn',    done: true,  active: false },
+          { label: 'Chờ xác nhận', done: true,  active: false },
+          { label: 'Đã xác nhận',  done: true,  active: false },
+          { label: 'Thanh toán',   done: true,  active: false },
+          { label: 'Hoàn thành',   done: true,  active: true  },
+        ]
       : [
           { label: 'Đặt bàn',       done: true,                         active: false },
-          { label: 'Chờ xác nhận',  done: isConfirmed || isOccupied,    active: isPending },
-          { label: 'Đã xác nhận',    done: isOccupied,                  active: isConfirmed },
-          { label: 'Thanh toán',      done: false,                       active: isOccupied },
+          { label: 'Chờ xác nhận',  done: isConfirmed || isOccupied,   active: isPending },
+          { label: 'Đã xác nhận',   done: isOccupied,                  active: isConfirmed },
+          { label: 'Thanh toán',    done: false,                        active: isOccupied },
         ];
-
     const timelineHTML = steps.map(s => `
       <div class="tl-step ${s.done ? 'done' : ''} ${s.active ? 'active' : ''} ${s.cancelled ? 'cancelled' : ''}">
         <div class="tl-dot">${s.done ? '✓' : s.cancelled ? '✕' : ''}</div>
         <div class="tl-label">${s.label}</div>
       </div>`).join('');
+
 
     // Dishes
     const dishesHTML = r.dishes.length

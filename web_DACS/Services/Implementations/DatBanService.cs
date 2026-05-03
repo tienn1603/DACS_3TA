@@ -9,11 +9,18 @@ namespace web_DACS.Services.Implementations
         private readonly IDatBanRepository _datBanRepo;
         private readonly IMonAnRepository _monAnRepo;
         private readonly IBanAnRepository _banAnRepo;
+        private readonly IDanhGiaRepository _danhGiaRepo;
 
-        public DatBanService(IDatBanRepository datBanRepo, IMonAnRepository monAnRepo)
+        public DatBanService(
+            IDatBanRepository datBanRepo,
+            IMonAnRepository monAnRepo,
+            IBanAnRepository banAnRepo,
+            IDanhGiaRepository danhGiaRepo)
         {
             _datBanRepo = datBanRepo;
             _monAnRepo = monAnRepo;
+            _banAnRepo = banAnRepo;
+            _danhGiaRepo = danhGiaRepo;
         }
 
         public async Task<ApiResponse> GetAllAsync()
@@ -122,6 +129,51 @@ namespace web_DACS.Services.Implementations
             var success = await _datBanRepo.ConfirmBookingAsync(datBanId);
             if (!success) return ApiResponse.Fail("Không tìm thấy đơn chờ xác nhận.");
             return ApiResponse.Ok("Đã xác nhận đặt bàn, bàn được chuyển sang trạng thái sử dụng.");
+        }
+
+        public async Task<ApiResponse> CreateDanhGiaAsync(int datBanId, string userId, int soSao, string? noiDung)
+        {
+            if (string.IsNullOrEmpty(userId))
+                return ApiResponse.Fail("UserId không hợp lệ.");
+
+            var datBan = await _datBanRepo.GetByIdAsync(datBanId);
+            if (datBan == null)
+                return ApiResponse.Fail("Không tìm thấy đơn đặt bàn.");
+
+            if (datBan.UserId != userId)
+                return ApiResponse.Fail("Bạn không có quyền đánh giá đơn này.");
+
+            // Chỉ cho phép đánh giá đơn đã thanh toán (TrangThai = 4)
+            if (datBan.TrangThai != 4)
+                return ApiResponse.Fail("Chỉ có thể đánh giá đơn đã thanh toán.");
+
+            if (await _danhGiaRepo.ExistsForDatBanAsync(datBanId))
+                return ApiResponse.Fail("Bạn đã đánh giá đơn này rồi.");
+
+            if (soSao < 1 || soSao > 5)
+                return ApiResponse.Fail("Số sao phải từ 1 đến 5.");
+
+            var danhGia = new DanhGia
+            {
+                DatBanId = datBanId,
+                UserId = userId,
+                SoSao = soSao,
+                NoiDung = noiDung,
+                NgayDanhGia = DateTime.UtcNow
+            };
+
+            await _danhGiaRepo.AddAsync(danhGia);
+            await _danhGiaRepo.SaveChangesAsync();
+
+            return ApiResponse.Ok("Cảm ơn bạn đã đánh giá!");
+        }
+
+        public async Task<ApiResponse> CancelByAdminAsync(int datBanId)
+        {
+            var success = await _datBanRepo.CancelPendingBookingByAdminAsync(datBanId);
+            if (!success)
+                return ApiResponse.Fail("Không thể hủy đơn này. Chỉ đơn đang chờ/xác nhận mới có thể hủy.");
+            return ApiResponse.Ok("Đã hủy đơn thành công, bàn đã được giải phóng.");
         }
 
     }
